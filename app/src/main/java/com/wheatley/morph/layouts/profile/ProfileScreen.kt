@@ -39,7 +39,14 @@ fun ProfileScreen() {
                 title = {
                     Text("Профиль")
                 },
-                scrollBehavior = scrollBehavior
+                scrollBehavior = scrollBehavior,
+                actions = {
+                    IconButton(onClick = {
+                        context.startActivity(Intent(context, SettingsActivity::class.java))
+                    }) {
+                        Icon(Icons.Rounded.Settings, contentDescription = "Настройки")
+                    }
+                }
             )
         },
         content = { innerPadding ->
@@ -56,14 +63,7 @@ fun ProfileScreen() {
                             .fillMaxSize()
                     ){
                         item {
-                            IconButton (
-                                onClick = {
-                                    context.startActivity(Intent(context, SettingsActivity::class.java))
-                                }
-                            )
-                            {
-                                Icon(Icons.Rounded.Settings, contentDescription = "Настройки")
-                            }
+
                         }
                     }
                 }

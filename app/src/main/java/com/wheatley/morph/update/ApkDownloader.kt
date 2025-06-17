@@ -1,12 +1,16 @@
 package com.wheatley.morph.update
 
-import android.app.*
-import android.content.*
+import android.app.DownloadManager
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
 import android.database.Cursor
 import android.net.Uri
-import android.os.Environment
 import androidx.core.app.NotificationCompat
 import androidx.core.content.FileProvider
+import androidx.core.net.toUri
 import java.io.File
 
 fun installApk(context: Context, apkFile: File) {
@@ -22,11 +26,11 @@ fun downloadApkWithProgress(context: Context, apkUrl: String) {
     val fileName = "update.apk"
     val apkFile = File(context.getExternalFilesDir(null), fileName)
 
-    val request = DownloadManager.Request(Uri.parse(apkUrl)).apply {
+    val request = DownloadManager.Request(apkUrl.toUri()).apply {
         setTitle("Загрузка обновления")
-        setDescription("Подготовка...")
+        setDescription("Загрузка...")
         setDestinationUri(Uri.fromFile(apkFile))
-        setNotificationVisibility(DownloadManager.Request.VISIBILITY_HIDDEN)
+        setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
         setMimeType("application/vnd.android.package-archive")
     }
 
@@ -37,10 +41,8 @@ fun downloadApkWithProgress(context: Context, apkUrl: String) {
     val channelId = "apk_update_channel"
     val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-        val channel = NotificationChannel(channelId, "Обновления", NotificationManager.IMPORTANCE_LOW)
-        notificationManager.createNotificationChannel(channel)
-    }
+    val channel = NotificationChannel(channelId, "Обновления", NotificationManager.IMPORTANCE_LOW)
+    notificationManager.createNotificationChannel(channel)
 
     val builder = NotificationCompat.Builder(context, channelId)
         .setSmallIcon(android.R.drawable.stat_sys_download)
