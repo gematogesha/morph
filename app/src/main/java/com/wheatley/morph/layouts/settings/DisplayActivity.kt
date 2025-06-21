@@ -105,7 +105,6 @@ fun DisplayScreen(
         }
     ) { innerPadding ->
         Surface(
-            color = MaterialTheme.colorScheme.surface,
             modifier = Modifier.fillMaxSize()
         ) {
             if (openDialogTheme.value) {

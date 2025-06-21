@@ -18,13 +18,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.CircularWavyProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
@@ -36,10 +36,8 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -51,6 +49,8 @@ import androidx.compose.ui.unit.dp
 import com.wheatley.morph.R
 import com.wheatley.morph.ui.theme.ApplySystemUi
 import com.wheatley.morph.ui.theme.MorphTheme
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import com.wheatley.morph.update.UpdateInfo
 import com.wheatley.morph.update.downloadApkWithProgress
 import com.wheatley.morph.update.fetchUpdateInfo
@@ -59,13 +59,13 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 
-class InfoActivity : ComponentActivity() {
+class NotifyActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             MorphTheme {
-                InfoScreen(onBackPressed = { finish() })
+                NotifyScreen(onBackPressed = { finish() })
             }
         }
     }
@@ -74,7 +74,7 @@ class InfoActivity : ComponentActivity() {
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "RestrictedApi")
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun InfoScreen(onBackPressed: () -> Unit) {
+fun NotifyScreen(onBackPressed: () -> Unit) {
 
     ApplySystemUi()
 
@@ -197,7 +197,7 @@ fun InfoScreen(onBackPressed: () -> Unit) {
                             headlineContent = { Text("Проверить обновление") },
                             trailingContent = {
                                 if (isLoading) {
-                                    CircularWavyProgressIndicator()
+                                    LoadingIndicator()
                                 }
                             }
                         )
