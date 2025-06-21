@@ -8,10 +8,15 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.wheatley.morph.components.darken
+import com.wheatley.morph.components.lighten
 
 private val lightScheme = lightColorScheme(
     primary = primaryLight,
@@ -89,183 +94,159 @@ private val darkScheme = darkColorScheme(
     surfaceContainerHighest = surfaceContainerHighestDark,
 )
 
-private val mediumContrastLightColorScheme = lightColorScheme(
-    primary = primaryLightMediumContrast,
-    onPrimary = onPrimaryLightMediumContrast,
-    primaryContainer = primaryContainerLightMediumContrast,
-    onPrimaryContainer = onPrimaryContainerLightMediumContrast,
-    secondary = secondaryLightMediumContrast,
-    onSecondary = onSecondaryLightMediumContrast,
-    secondaryContainer = secondaryContainerLightMediumContrast,
-    onSecondaryContainer = onSecondaryContainerLightMediumContrast,
-    tertiary = tertiaryLightMediumContrast,
-    onTertiary = onTertiaryLightMediumContrast,
-    tertiaryContainer = tertiaryContainerLightMediumContrast,
-    onTertiaryContainer = onTertiaryContainerLightMediumContrast,
-    error = errorLightMediumContrast,
-    onError = onErrorLightMediumContrast,
-    errorContainer = errorContainerLightMediumContrast,
-    onErrorContainer = onErrorContainerLightMediumContrast,
-    background = backgroundLightMediumContrast,
-    onBackground = onBackgroundLightMediumContrast,
-    surface = surfaceLightMediumContrast,
-    onSurface = onSurfaceLightMediumContrast,
-    surfaceVariant = surfaceVariantLightMediumContrast,
-    onSurfaceVariant = onSurfaceVariantLightMediumContrast,
-    outline = outlineLightMediumContrast,
-    outlineVariant = outlineVariantLightMediumContrast,
-    scrim = scrimLightMediumContrast,
-    inverseSurface = inverseSurfaceLightMediumContrast,
-    inverseOnSurface = inverseOnSurfaceLightMediumContrast,
-    inversePrimary = inversePrimaryLightMediumContrast,
-    surfaceDim = surfaceDimLightMediumContrast,
-    surfaceBright = surfaceBrightLightMediumContrast,
-    surfaceContainerLowest = surfaceContainerLowestLightMediumContrast,
-    surfaceContainerLow = surfaceContainerLowLightMediumContrast,
-    surfaceContainer = surfaceContainerLightMediumContrast,
-    surfaceContainerHigh = surfaceContainerHighLightMediumContrast,
-    surfaceContainerHighest = surfaceContainerHighestLightMediumContrast,
+
+@Immutable
+data class ExtendedColorScheme(
+    val green: ColorFamily,
+    val orange: ColorFamily,
+    val mint: ColorFamily,
+    val lightPurple: ColorFamily,
+    val yellow: ColorFamily,
+    val pink: ColorFamily,
+    val bluePurple: ColorFamily,
+    val lightGreen: ColorFamily
 )
 
-private val highContrastLightColorScheme = lightColorScheme(
-    primary = primaryLightHighContrast,
-    onPrimary = onPrimaryLightHighContrast,
-    primaryContainer = primaryContainerLightHighContrast,
-    onPrimaryContainer = onPrimaryContainerLightHighContrast,
-    secondary = secondaryLightHighContrast,
-    onSecondary = onSecondaryLightHighContrast,
-    secondaryContainer = secondaryContainerLightHighContrast,
-    onSecondaryContainer = onSecondaryContainerLightHighContrast,
-    tertiary = tertiaryLightHighContrast,
-    onTertiary = onTertiaryLightHighContrast,
-    tertiaryContainer = tertiaryContainerLightHighContrast,
-    onTertiaryContainer = onTertiaryContainerLightHighContrast,
-    error = errorLightHighContrast,
-    onError = onErrorLightHighContrast,
-    errorContainer = errorContainerLightHighContrast,
-    onErrorContainer = onErrorContainerLightHighContrast,
-    background = backgroundLightHighContrast,
-    onBackground = onBackgroundLightHighContrast,
-    surface = surfaceLightHighContrast,
-    onSurface = onSurfaceLightHighContrast,
-    surfaceVariant = surfaceVariantLightHighContrast,
-    onSurfaceVariant = onSurfaceVariantLightHighContrast,
-    outline = outlineLightHighContrast,
-    outlineVariant = outlineVariantLightHighContrast,
-    scrim = scrimLightHighContrast,
-    inverseSurface = inverseSurfaceLightHighContrast,
-    inverseOnSurface = inverseOnSurfaceLightHighContrast,
-    inversePrimary = inversePrimaryLightHighContrast,
-    surfaceDim = surfaceDimLightHighContrast,
-    surfaceBright = surfaceBrightLightHighContrast,
-    surfaceContainerLowest = surfaceContainerLowestLightHighContrast,
-    surfaceContainerLow = surfaceContainerLowLightHighContrast,
-    surfaceContainer = surfaceContainerLightHighContrast,
-    surfaceContainerHigh = surfaceContainerHighLightHighContrast,
-    surfaceContainerHighest = surfaceContainerHighestLightHighContrast,
+@Immutable
+data class ColorFamily(
+    val color: Color,
+    val secondColor: Color,
+    val colorContainer: Color,
+    val onColorContainer: Color
 )
 
-private val mediumContrastDarkColorScheme = darkColorScheme(
-    primary = primaryDarkMediumContrast,
-    onPrimary = onPrimaryDarkMediumContrast,
-    primaryContainer = primaryContainerDarkMediumContrast,
-    onPrimaryContainer = onPrimaryContainerDarkMediumContrast,
-    secondary = secondaryDarkMediumContrast,
-    onSecondary = onSecondaryDarkMediumContrast,
-    secondaryContainer = secondaryContainerDarkMediumContrast,
-    onSecondaryContainer = onSecondaryContainerDarkMediumContrast,
-    tertiary = tertiaryDarkMediumContrast,
-    onTertiary = onTertiaryDarkMediumContrast,
-    tertiaryContainer = tertiaryContainerDarkMediumContrast,
-    onTertiaryContainer = onTertiaryContainerDarkMediumContrast,
-    error = errorDarkMediumContrast,
-    onError = onErrorDarkMediumContrast,
-    errorContainer = errorContainerDarkMediumContrast,
-    onErrorContainer = onErrorContainerDarkMediumContrast,
-    background = backgroundDarkMediumContrast,
-    onBackground = onBackgroundDarkMediumContrast,
-    surface = surfaceDarkMediumContrast,
-    onSurface = onSurfaceDarkMediumContrast,
-    surfaceVariant = surfaceVariantDarkMediumContrast,
-    onSurfaceVariant = onSurfaceVariantDarkMediumContrast,
-    outline = outlineDarkMediumContrast,
-    outlineVariant = outlineVariantDarkMediumContrast,
-    scrim = scrimDarkMediumContrast,
-    inverseSurface = inverseSurfaceDarkMediumContrast,
-    inverseOnSurface = inverseOnSurfaceDarkMediumContrast,
-    inversePrimary = inversePrimaryDarkMediumContrast,
-    surfaceDim = surfaceDimDarkMediumContrast,
-    surfaceBright = surfaceBrightDarkMediumContrast,
-    surfaceContainerLowest = surfaceContainerLowestDarkMediumContrast,
-    surfaceContainerLow = surfaceContainerLowDarkMediumContrast,
-    surfaceContainer = surfaceContainerDarkMediumContrast,
-    surfaceContainerHigh = surfaceContainerHighDarkMediumContrast,
-    surfaceContainerHighest = surfaceContainerHighestDarkMediumContrast,
+val extendedLight = ExtendedColorScheme(
+    green = ColorFamily(
+        color = greenLight,
+        secondColor = lighten(greenLight, 0.35f),
+        colorContainer = lighten(greenLight, 0.8f),
+        onColorContainer = darken(greenLight, 0.05f)
+    ),
+    orange = ColorFamily(
+        color = orangeLight,
+        secondColor = lighten(orangeLight, 0.35f),
+        colorContainer = lighten(orangeLight, 0.8f),
+        onColorContainer = darken(orangeLight, 0.05f)
+    ),
+    mint = ColorFamily(
+        color = mintLight,
+        secondColor = lighten(mintLight, 0.35f),
+        colorContainer = lighten(mintLight, 0.8f),
+        onColorContainer = darken(mintLight, 0.05f)
+    ),
+    lightPurple = ColorFamily(
+        color = lightPurpleLight,
+        secondColor = lighten(lightPurpleLight, 0.35f),
+        colorContainer = lighten(lightPurpleLight, 0.8f),
+        onColorContainer = darken(lightPurpleLight, 0.05f)
+    ),
+    yellow = ColorFamily(
+        color = yellowLight,
+        secondColor = lighten(yellowLight, 0.35f),
+        colorContainer = lighten(yellowLight, 0.8f),
+        onColorContainer = darken(yellowLight, 0.05f)
+    ),
+    pink = ColorFamily(
+        color = pinkLight,
+        secondColor = lighten(pinkLight, 0.35f),
+        colorContainer = lighten(pinkLight, 0.8f),
+        onColorContainer = darken(pinkLight, 0.05f)
+    ),
+    bluePurple = ColorFamily(
+        color = bluePurpleLight,
+        secondColor = lighten(bluePurpleLight, 0.35f),
+        colorContainer = lighten(bluePurpleLight, 0.8f),
+        onColorContainer = darken(bluePurpleLight, 0.05f)
+    ),
+    lightGreen = ColorFamily(
+        color = lightGreenLight,
+        secondColor = lighten(lightGreenLight, 0.35f),
+        colorContainer = lighten(lightGreenLight, 0.8f),
+        onColorContainer = darken(lightGreenLight, 0.05f)
+    )
 )
 
-private val highContrastDarkColorScheme = darkColorScheme(
-    primary = primaryDarkHighContrast,
-    onPrimary = onPrimaryDarkHighContrast,
-    primaryContainer = primaryContainerDarkHighContrast,
-    onPrimaryContainer = onPrimaryContainerDarkHighContrast,
-    secondary = secondaryDarkHighContrast,
-    onSecondary = onSecondaryDarkHighContrast,
-    secondaryContainer = secondaryContainerDarkHighContrast,
-    onSecondaryContainer = onSecondaryContainerDarkHighContrast,
-    tertiary = tertiaryDarkHighContrast,
-    onTertiary = onTertiaryDarkHighContrast,
-    tertiaryContainer = tertiaryContainerDarkHighContrast,
-    onTertiaryContainer = onTertiaryContainerDarkHighContrast,
-    error = errorDarkHighContrast,
-    onError = onErrorDarkHighContrast,
-    errorContainer = errorContainerDarkHighContrast,
-    onErrorContainer = onErrorContainerDarkHighContrast,
-    background = backgroundDarkHighContrast,
-    onBackground = onBackgroundDarkHighContrast,
-    surface = surfaceDarkHighContrast,
-    onSurface = onSurfaceDarkHighContrast,
-    surfaceVariant = surfaceVariantDarkHighContrast,
-    onSurfaceVariant = onSurfaceVariantDarkHighContrast,
-    outline = outlineDarkHighContrast,
-    outlineVariant = outlineVariantDarkHighContrast,
-    scrim = scrimDarkHighContrast,
-    inverseSurface = inverseSurfaceDarkHighContrast,
-    inverseOnSurface = inverseOnSurfaceDarkHighContrast,
-    inversePrimary = inversePrimaryDarkHighContrast,
-    surfaceDim = surfaceDimDarkHighContrast,
-    surfaceBright = surfaceBrightDarkHighContrast,
-    surfaceContainerLowest = surfaceContainerLowestDarkHighContrast,
-    surfaceContainerLow = surfaceContainerLowDarkHighContrast,
-    surfaceContainer = surfaceContainerDarkHighContrast,
-    surfaceContainerHigh = surfaceContainerHighDarkHighContrast,
-    surfaceContainerHighest = surfaceContainerHighestDarkHighContrast,
+val extendedDark = ExtendedColorScheme(
+    green = ColorFamily(
+        color = darken(greenLight, 0.5f),
+        secondColor = darken(greenLight, 0.2f),
+        colorContainer = darken(greenLight, 0.6f),
+        onColorContainer = darken(greenLight, 0.2f)
+    ),
+    orange = ColorFamily(
+        color = darken(orangeLight, 0.5f),
+        secondColor = darken(orangeLight, 0.2f),
+        colorContainer = darken(orangeLight, 0.6f),
+        onColorContainer = darken(orangeLight, 0.2f)
+    ),
+    mint= ColorFamily(
+        color = darken(mintLight, 0.5f),
+        secondColor = darken(mintLight, 0.2f),
+        colorContainer = darken(mintLight, 0.6f),
+        onColorContainer = darken(mintLight, 0.2f)
+    ),
+    lightPurple = ColorFamily(
+        color = darken(lightPurpleLight, 0.5f),
+        secondColor = darken(lightPurpleLight, 0.2f),
+        colorContainer = darken(lightPurpleLight, 0.6f),
+        onColorContainer = darken(lightPurpleLight, 0.2f)
+    ),
+    yellow = ColorFamily(
+        color = darken(yellowLight, 0.5f),
+        secondColor = darken(yellowLight, 0.2f),
+        colorContainer = darken(yellowLight, 0.6f),
+        onColorContainer = darken(yellowLight, 0.2f)
+    ),
+    pink = ColorFamily(
+        color = darken(pinkLight, 0.5f),
+        secondColor = darken(pinkLight, 0.2f),
+        colorContainer = darken(pinkLight, 0.6f),
+        onColorContainer = darken(pinkLight, 0.2f)
+    ),
+    bluePurple= ColorFamily(
+        color = darken(bluePurpleLight, 0.5f),
+        secondColor = darken(bluePurpleLight, 0.2f),
+        colorContainer = darken(bluePurpleLight, 0.6f),
+        onColorContainer = darken(bluePurpleLight, 0.2f)
+    ),
+    lightGreen = ColorFamily(
+        color = darken(lightGreenLight, 0.5f),
+        secondColor = darken(lightGreenLight, 0.2f),
+        colorContainer = darken(lightGreenLight, 0.6f),
+        onColorContainer = darken(lightGreenLight, 0.2f)
+    )
 )
+
+val LocalExColorScheme = staticCompositionLocalOf { extendedLight }
 
 @Composable
 fun MorphTheme(
     dynamicColor: Boolean = false,
     content: @Composable() () -> Unit
 ) {
-    val isDarkTheme = isDarkThemeEnabled()
+    val darkTheme = isDarkThemeEnabled()
 
     ApplySystemUi()
 
     val colorScheme = when {
       dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
           val context = LocalContext.current
-          if (isDarkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+          if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
       }
 
-        isDarkTheme -> mediumContrastDarkColorScheme
-      else -> mediumContrastLightColorScheme
+        darkTheme -> darkScheme
+      else -> lightScheme
     }
 
+    val extendedColorScheme = if (darkTheme) extendedDark else extendedLight
 
-    MaterialTheme(
-      colorScheme = colorScheme,
-      typography = MorphTypography,
-      content = content
-    )
+    CompositionLocalProvider(LocalExColorScheme provides extendedColorScheme) {
+        MaterialTheme(
+            colorScheme = colorScheme,
+            typography = MorphTypography,
+            content = content
+        )
+    }
 }
 
 @Composable
@@ -281,17 +262,33 @@ fun isDarkThemeEnabled(): Boolean {
 fun ApplySystemUi() {
     val systemUiController = rememberSystemUiController()
     val navBarColor = MaterialTheme.colorScheme.surfaceContainer
-    val isDarkTheme = isDarkThemeEnabled()
+    val darkTheme = isDarkThemeEnabled()
 
-    DisposableEffect(systemUiController, isDarkTheme) {
+    DisposableEffect(systemUiController, darkTheme) {
 
         systemUiController.setSystemBarsColor(
             color = Color.Transparent,
-            darkIcons = !isDarkTheme
+            darkIcons = !darkTheme
         )
 
         systemUiController.setNavigationBarColor(
             color = navBarColor,
+        )
+
+        onDispose {}
+    }
+}
+
+@Composable
+fun ApplySystemUiRegister() {
+    val systemUiController = rememberSystemUiController()
+    val darkTheme = isDarkThemeEnabled()
+
+    DisposableEffect(systemUiController, darkTheme) {
+
+        systemUiController.setSystemBarsColor(
+            color = Color.Transparent,
+            darkIcons = !darkTheme
         )
 
         onDispose {}
