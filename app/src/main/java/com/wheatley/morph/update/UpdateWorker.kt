@@ -3,15 +3,30 @@ package com.wheatley.morph.update
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import androidx.core.content.edit
 
 class UpdateWorker(context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
     override suspend fun doWork(): Result {
+        val prefs = applicationContext.getSharedPreferences("update_prefs", Context.MODE_PRIVATE)
+
         val info = fetchUpdateInfo() ?: return Result.failure()
         val current = getCurrentAppVersion(applicationContext)
-        if (isNewerVersion(info.version, current)) {
-            downloadApkWithProgress(applicationContext, info.apkUrl)
+
+        return if (isNewerVersion(info.version, current)) {
+            // Сохраняем apkUrl, changelog и версию, если нужно
+            prefs.edit {
+                putBoolean("has_update", true)
+                putString("update_version", info.version)
+                putString("update_changelog", info.changelog)
+                putString("update_url", info.apkUrl)
+            }
+            Result.success()
+        } else {
+            prefs.edit {
+                putBoolean("has_update", false)
+            }
+            Result.success()
         }
-        return Result.success()
     }
     private fun getCurrentAppVersion(context: Context): String {
         return try {
