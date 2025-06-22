@@ -1,10 +1,12 @@
-package com.wheatley.morph.components
+package com.wheatley.morph.utils
 
+import android.icu.util.Calendar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import com.wheatley.morph.model.ChallengeColor
 import com.wheatley.morph.ui.theme.ColorFamily
 import com.wheatley.morph.ui.theme.LocalExColorScheme
+import java.util.Date
 
 fun pluralDays(n: Int): String {
     val rem100 = n % 100
@@ -36,6 +38,13 @@ fun darken(color: Color, factor: Float): Color {
         blue = color.blue * (1 - factor),
         alpha = color.alpha
     )
+}
+
+fun Date.isSameDay(other: Date): Boolean {
+    val cal1 = Calendar.getInstance().apply { time = this@isSameDay }
+    val cal2 = Calendar.getInstance().apply { time = other }
+    return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR)
+            && cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR)
 }
 
 @Composable
