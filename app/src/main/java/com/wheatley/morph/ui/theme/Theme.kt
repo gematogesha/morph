@@ -15,8 +15,8 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import com.wheatley.morph.components.darken
-import com.wheatley.morph.components.lighten
+import com.wheatley.morph.utils.darken
+import com.wheatley.morph.utils.lighten
 
 private val lightScheme = lightColorScheme(
     primary = primaryLight,
@@ -97,6 +97,7 @@ private val darkScheme = darkColorScheme(
 
 @Immutable
 data class ExtendedColorScheme(
+    val primary: ColorFamily,
     val green: ColorFamily,
     val orange: ColorFamily,
     val mint: ColorFamily,
@@ -116,104 +117,116 @@ data class ColorFamily(
 )
 
 val extendedLight = ExtendedColorScheme(
+    primary = ColorFamily(
+        color = primary,
+        secondColor = lighten(primary, 0.35f),
+        colorContainer = lighten(primary, 0.8f),
+        onColorContainer = darken(primary, 0.05f)
+    ),
     green = ColorFamily(
-        color = greenLight,
-        secondColor = lighten(greenLight, 0.35f),
-        colorContainer = lighten(greenLight, 0.8f),
-        onColorContainer = darken(greenLight, 0.05f)
+        color = green,
+        secondColor = lighten(green, 0.35f),
+        colorContainer = lighten(green, 0.8f),
+        onColorContainer = darken(green, 0.05f)
     ),
     orange = ColorFamily(
-        color = orangeLight,
-        secondColor = lighten(orangeLight, 0.35f),
-        colorContainer = lighten(orangeLight, 0.8f),
-        onColorContainer = darken(orangeLight, 0.05f)
+        color = orange,
+        secondColor = lighten(orange, 0.35f),
+        colorContainer = lighten(orange, 0.8f),
+        onColorContainer = darken(orange, 0.05f)
     ),
     mint = ColorFamily(
-        color = mintLight,
-        secondColor = lighten(mintLight, 0.35f),
-        colorContainer = lighten(mintLight, 0.8f),
-        onColorContainer = darken(mintLight, 0.05f)
+        color = mint,
+        secondColor = lighten(mint, 0.35f),
+        colorContainer = lighten(mint, 0.8f),
+        onColorContainer = darken(mint, 0.05f)
     ),
     lightPurple = ColorFamily(
-        color = lightPurpleLight,
-        secondColor = lighten(lightPurpleLight, 0.35f),
-        colorContainer = lighten(lightPurpleLight, 0.8f),
-        onColorContainer = darken(lightPurpleLight, 0.05f)
+        color = lightPurple,
+        secondColor = lighten(lightPurple, 0.35f),
+        colorContainer = lighten(lightPurple, 0.8f),
+        onColorContainer = darken(lightPurple, 0.05f)
     ),
     yellow = ColorFamily(
-        color = yellowLight,
-        secondColor = lighten(yellowLight, 0.35f),
-        colorContainer = lighten(yellowLight, 0.8f),
-        onColorContainer = darken(yellowLight, 0.05f)
+        color = yellow,
+        secondColor = lighten(yellow, 0.35f),
+        colorContainer = lighten(yellow, 0.8f),
+        onColorContainer = darken(yellow, 0.05f)
     ),
     pink = ColorFamily(
-        color = pinkLight,
-        secondColor = lighten(pinkLight, 0.35f),
-        colorContainer = lighten(pinkLight, 0.8f),
-        onColorContainer = darken(pinkLight, 0.05f)
+        color = pink,
+        secondColor = lighten(pink, 0.35f),
+        colorContainer = lighten(pink, 0.8f),
+        onColorContainer = darken(pink, 0.05f)
     ),
     bluePurple = ColorFamily(
-        color = bluePurpleLight,
-        secondColor = lighten(bluePurpleLight, 0.35f),
-        colorContainer = lighten(bluePurpleLight, 0.8f),
-        onColorContainer = darken(bluePurpleLight, 0.05f)
+        color = bluePurple,
+        secondColor = lighten(bluePurple, 0.35f),
+        colorContainer = lighten(bluePurple, 0.8f),
+        onColorContainer = darken(bluePurple, 0.05f)
     ),
     lightGreen = ColorFamily(
-        color = lightGreenLight,
-        secondColor = lighten(lightGreenLight, 0.35f),
-        colorContainer = lighten(lightGreenLight, 0.8f),
-        onColorContainer = darken(lightGreenLight, 0.05f)
+        color = lightGreen,
+        secondColor = lighten(lightGreen, 0.35f),
+        colorContainer = lighten(lightGreen, 0.8f),
+        onColorContainer = darken(lightGreen, 0.05f)
     )
 )
 
 val extendedDark = ExtendedColorScheme(
+    primary = ColorFamily(
+        color = primary,
+        secondColor = lighten(primary, 0.35f),
+        colorContainer = lighten(primary, 0.8f),
+        onColorContainer = darken(primary, 0.05f)
+    ),
     green = ColorFamily(
-        color = darken(greenLight, 0.5f),
-        secondColor = darken(greenLight, 0.2f),
-        colorContainer = darken(greenLight, 0.6f),
-        onColorContainer = darken(greenLight, 0.2f)
+        color = darken(green, 0.5f),
+        secondColor = darken(green, 0.2f),
+        colorContainer = darken(green, 0.6f),
+        onColorContainer = darken(green, 0.2f)
     ),
     orange = ColorFamily(
-        color = darken(orangeLight, 0.5f),
-        secondColor = darken(orangeLight, 0.2f),
-        colorContainer = darken(orangeLight, 0.6f),
-        onColorContainer = darken(orangeLight, 0.2f)
+        color = darken(orange, 0.5f),
+        secondColor = darken(orange, 0.2f),
+        colorContainer = darken(orange, 0.6f),
+        onColorContainer = darken(orange, 0.2f)
     ),
     mint= ColorFamily(
-        color = darken(mintLight, 0.5f),
-        secondColor = darken(mintLight, 0.2f),
-        colorContainer = darken(mintLight, 0.6f),
-        onColorContainer = darken(mintLight, 0.2f)
+        color = darken(mint, 0.5f),
+        secondColor = darken(mint, 0.2f),
+        colorContainer = darken(mint, 0.6f),
+        onColorContainer = darken(mint, 0.2f)
     ),
     lightPurple = ColorFamily(
-        color = darken(lightPurpleLight, 0.5f),
-        secondColor = darken(lightPurpleLight, 0.2f),
-        colorContainer = darken(lightPurpleLight, 0.6f),
-        onColorContainer = darken(lightPurpleLight, 0.2f)
+        color = darken(lightPurple, 0.5f),
+        secondColor = darken(lightPurple, 0.2f),
+        colorContainer = darken(lightPurple, 0.6f),
+        onColorContainer = darken(lightPurple, 0.2f)
     ),
     yellow = ColorFamily(
-        color = darken(yellowLight, 0.5f),
-        secondColor = darken(yellowLight, 0.2f),
-        colorContainer = darken(yellowLight, 0.6f),
-        onColorContainer = darken(yellowLight, 0.2f)
+        color = darken(yellow, 0.5f),
+        secondColor = darken(yellow, 0.2f),
+        colorContainer = darken(yellow, 0.6f),
+        onColorContainer = darken(yellow, 0.2f)
     ),
     pink = ColorFamily(
-        color = darken(pinkLight, 0.5f),
-        secondColor = darken(pinkLight, 0.2f),
-        colorContainer = darken(pinkLight, 0.6f),
-        onColorContainer = darken(pinkLight, 0.2f)
+        color = darken(pink, 0.5f),
+        secondColor = darken(pink, 0.2f),
+        colorContainer = darken(pink, 0.6f),
+        onColorContainer = darken(pink, 0.2f)
     ),
     bluePurple= ColorFamily(
-        color = darken(bluePurpleLight, 0.5f),
-        secondColor = darken(bluePurpleLight, 0.2f),
-        colorContainer = darken(bluePurpleLight, 0.6f),
-        onColorContainer = darken(bluePurpleLight, 0.2f)
+        color = darken(bluePurple, 0.5f),
+        secondColor = darken(bluePurple, 0.2f),
+        colorContainer = darken(bluePurple, 0.6f),
+        onColorContainer = darken(bluePurple, 0.2f)
     ),
     lightGreen = ColorFamily(
-        color = darken(lightGreenLight, 0.5f),
-        secondColor = darken(lightGreenLight, 0.2f),
-        colorContainer = darken(lightGreenLight, 0.6f),
-        onColorContainer = darken(lightGreenLight, 0.2f)
+        color = darken(lightGreen, 0.5f),
+        secondColor = darken(lightGreen, 0.2f),
+        colorContainer = darken(lightGreen, 0.6f),
+        onColorContainer = darken(lightGreen, 0.2f)
     )
 )
 
