@@ -88,7 +88,6 @@ fun CardAction(
                 Text(
                     text = label,
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
                 )
 
             }
@@ -104,7 +103,7 @@ fun CardAction(
                     color = numberColor
                 )
                 IconButton(
-                    onClick = { action }
+                    onClick = { action() }
                 ) {
                     Icon(imageVector = actionIcon, contentDescription = null)
                 }
