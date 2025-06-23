@@ -1,9 +1,7 @@
 package com.wheatley.morph.layouts.settings
 
 import android.annotation.SuppressLint
-import android.content.pm.PackageManager
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -17,23 +15,19 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.outlined.Download
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.CircularWavyProgressIndicator
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -51,23 +45,21 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.wheatley.morph.R
+import com.wheatley.morph.components.UpdateScreen
 import com.wheatley.morph.ui.theme.ApplySystemUi
 import com.wheatley.morph.ui.theme.MorphTheme
-import com.wheatley.morph.update.UpdateInfo
-import com.wheatley.morph.update.downloadApkWithProgress
-import com.wheatley.morph.update.fetchUpdateInfo
-import kotlinx.coroutines.Dispatchers
+import com.wheatley.morph.util.app.AppInfo.getVersionName
+import com.wheatley.morph.util.update.UpdateChecker
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 
-class InfoActivity : ComponentActivity() {
+class AboutActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             MorphTheme {
-                InfoScreen(onBackPressed = { finish() })
+                AboutScreen(onBackPressed = { finish() })
             }
         }
     }
@@ -76,7 +68,7 @@ class InfoActivity : ComponentActivity() {
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "RestrictedApi")
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun InfoScreen(onBackPressed: () -> Unit) {
+fun AboutScreen(onBackPressed: () -> Unit) {
 
     ApplySystemUi()
 
@@ -84,20 +76,16 @@ fun InfoScreen(onBackPressed: () -> Unit) {
 
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+
     var isLoading by remember { mutableStateOf(false) }
-    var showDialog by remember { mutableStateOf(false) }
-    var updateInfo by remember { mutableStateOf<UpdateInfo?>(null) }
+    var showSheet by remember { mutableStateOf(false) }
+
+    var updateVersion by remember { mutableStateOf("") }
+    var updateChangelog by remember { mutableStateOf("") }
+    var updateDownload by remember { mutableStateOf("") }
 
     val snackbarHostState = remember { SnackbarHostState() }
 
-    val versionName = remember {
-        try {
-            val packageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
-            packageInfo.versionName
-        } catch (e: PackageManager.NameNotFoundException) {
-            "Unknown"
-        }
-    }
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -150,9 +138,7 @@ fun InfoScreen(onBackPressed: () -> Unit) {
                     ListItem(
                         headlineContent = { Text("Версия") },
                         supportingContent = {
-                            if (versionName != null) {
-                                Text(versionName)
-                            }
+                            Text(getVersionName(true))
                         },
                     )
                 }
@@ -164,31 +150,19 @@ fun InfoScreen(onBackPressed: () -> Unit) {
                                 onClick = {
                                     scope.launch {
                                         isLoading = true
-                                        try {
-                                            val info = fetchUpdateInfo()
 
-                                            val current = withContext(Dispatchers.IO) {
-                                                context.packageManager.getPackageInfo(context.packageName, 0).versionName ?: "1.0.0"
-                                            }
-
-                                            when {
-                                                info == null -> {
-                                                    snackbarHostState.showSnackbar("Не удалось получить данные об обновлении")
-                                                }
-                                                info.version != current -> {
-                                                    updateInfo = info
-                                                    showDialog = true
-                                                }
-                                                else -> {
-                                                    snackbarHostState.showSnackbar("У вас последняя версия")
-                                                }
-                                            }
-                                        } catch (e: Exception) {
-                                            Log.e("InfoScreen", "Update check failed", e)
-                                            snackbarHostState.showSnackbar("Произошла ошибка: ${e.localizedMessage}")
-                                        } finally {
-                                            isLoading = false
-                                        }
+                                        UpdateChecker(context).checkVersion(
+                                            snackbarHostState = snackbarHostState,
+                                            onNewUpdate = { version, changelog, download ->
+                                                updateVersion = version
+                                                updateChangelog = changelog
+                                                updateDownload = download
+                                                showSheet = true
+                                            },
+                                            onFinish = {
+                                                isLoading = false
+                                            },
+                                        )
                                     }
                                 },
                                 enabled = !isLoading
@@ -199,42 +173,28 @@ fun InfoScreen(onBackPressed: () -> Unit) {
                             headlineContent = { Text("Проверить обновление") },
                             trailingContent = {
                                 if (isLoading) {
-                                    CircularWavyProgressIndicator()
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.size(32.dp)
+                                    )
                                 }
                             }
                         )
                     }
-                    if (showDialog && updateInfo != null) {
-                        AlertDialog(
-                            icon = {
-                                Icon(
-                                    imageVector = Icons.Outlined.Download,
-                                    contentDescription = "Обновление",
-                                    tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier
-                                        .size(48.dp)
-                                )
-                            },
-                            onDismissRequest = { showDialog = false },
-                            confirmButton = {
-                                TextButton(onClick = {
-                                    showDialog = false
-                                    downloadApkWithProgress(context, updateInfo!!.apkUrl)
-                                }) {
-                                    Text("Обновить")
-                                }
-                            },
-                            dismissButton = {
-                                TextButton(onClick = { showDialog = false }) {
-                                    Text("Позже")
-                                }
-                            },
-                            title = { Text("Доступна версия ${updateInfo!!.version}") },
-                            text = { Text(updateInfo!!.changelog) }
-                        )
-                    }
                 }
+            }
+            if (showSheet) {
+                UpdateScreen(
+                    versionName = updateVersion,
+                    changelogInfo = updateChangelog,
+                    downloadLink = updateDownload,
+                    showSheet = showSheet,
+                    onDismiss = { showSheet = false }
+                )
             }
         }
     }
 }
+
+
+
+

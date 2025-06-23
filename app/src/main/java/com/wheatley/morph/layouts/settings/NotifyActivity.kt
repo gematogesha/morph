@@ -51,9 +51,6 @@ import com.wheatley.morph.ui.theme.ApplySystemUi
 import com.wheatley.morph.ui.theme.MorphTheme
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.wheatley.morph.update.UpdateInfo
-import com.wheatley.morph.update.downloadApkWithProgress
-import com.wheatley.morph.update.fetchUpdateInfo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -84,7 +81,6 @@ fun NotifyScreen(onBackPressed: () -> Unit) {
     val scope = rememberCoroutineScope()
     var isLoading by remember { mutableStateOf(false) }
     var showDialog by remember { mutableStateOf(false) }
-    var updateInfo by remember { mutableStateOf<UpdateInfo?>(null) }
 
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -160,34 +156,7 @@ fun NotifyScreen(onBackPressed: () -> Unit) {
                             .fillMaxWidth()
                             .clickable(
                                 onClick = {
-                                    scope.launch {
-                                        isLoading = true
-                                        try {
-                                            val info = fetchUpdateInfo()
 
-                                            val current = withContext(Dispatchers.IO) {
-                                                context.packageManager.getPackageInfo(context.packageName, 0).versionName ?: "1.0.0"
-                                            }
-
-                                            when {
-                                                info == null -> {
-                                                    snackbarHostState.showSnackbar("Не удалось получить данные об обновлении")
-                                                }
-                                                info.version != current -> {
-                                                    updateInfo = info
-                                                    showDialog = true
-                                                }
-                                                else -> {
-                                                    snackbarHostState.showSnackbar("У вас последняя версия")
-                                                }
-                                            }
-                                        } catch (e: Exception) {
-                                            Log.e("InfoScreen", "Update check failed", e)
-                                            snackbarHostState.showSnackbar("Произошла ошибка: ${e.localizedMessage}")
-                                        } finally {
-                                            isLoading = false
-                                        }
-                                    }
                                 },
                                 enabled = !isLoading
                             ),
@@ -200,26 +169,6 @@ fun NotifyScreen(onBackPressed: () -> Unit) {
                                     LoadingIndicator()
                                 }
                             }
-                        )
-                    }
-                    if (showDialog && updateInfo != null) {
-                        AlertDialog(
-                            onDismissRequest = { showDialog = false },
-                            confirmButton = {
-                                TextButton(onClick = {
-                                    showDialog = false
-                                    downloadApkWithProgress(context, updateInfo!!.apkUrl)
-                                }) {
-                                    Text("Обновить")
-                                }
-                            },
-                            dismissButton = {
-                                TextButton(onClick = { showDialog = false }) {
-                                    Text("Позже")
-                                }
-                            },
-                            title = { Text("Доступна версия ${updateInfo!!.version}") },
-                            text = { Text(updateInfo!!.changelog) }
                         )
                     }
                 }
