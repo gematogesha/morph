@@ -1,5 +1,5 @@
 package com.wheatley.morph.ui.theme
-import ThemeManager
+import com.wheatley.morph.util.ui.ThemeManager
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
@@ -15,8 +15,8 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import com.wheatley.morph.utils.darken
-import com.wheatley.morph.utils.lighten
+import com.wheatley.morph.util.app.darken
+import com.wheatley.morph.util.app.lighten
 
 private val lightScheme = lightColorScheme(
     primary = primaryLight,
