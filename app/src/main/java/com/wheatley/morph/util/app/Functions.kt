@@ -1,11 +1,11 @@
-package com.wheatley.morph.utils
+package com.wheatley.morph.util.app
 
-import android.icu.util.Calendar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import com.wheatley.morph.model.ChallengeColor
 import com.wheatley.morph.ui.theme.ColorFamily
 import com.wheatley.morph.ui.theme.LocalExColorScheme
+import java.time.ZoneId
 import java.util.Date
 
 fun pluralDays(n: Int): String {
@@ -41,10 +41,9 @@ fun darken(color: Color, factor: Float): Color {
 }
 
 fun Date.isSameDay(other: Date): Boolean {
-    val cal1 = Calendar.getInstance().apply { time = this@isSameDay }
-    val cal2 = Calendar.getInstance().apply { time = other }
-    return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR)
-            && cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR)
+    val date1 = this.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
+    val date2 = other.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
+    return date1 == date2
 }
 
 @Composable
