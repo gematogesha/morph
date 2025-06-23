@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
+import com.wheatley.morph.layouts.onboarding.RegistrationActivity
 import com.wheatley.morph.model.UserPrefs
 import kotlinx.coroutines.launch
 
