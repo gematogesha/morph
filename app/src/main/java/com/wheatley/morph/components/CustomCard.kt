@@ -113,10 +113,21 @@ fun CardAction(
 }
 
 @Composable
-fun ChallengeCard() {
+fun ChallengeCard(
+    text: String,
+    subText: String,
+    icon: String,
+) {
     CardBig(
+        
     ) {
-
+        CardBadge(
+            modifier = TODO(),
+            icon = TODO(),
+            colorTop = TODO()
+        ) {
+            
+        }
     }
 }
 
