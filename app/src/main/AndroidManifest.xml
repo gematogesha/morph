@@ -47,7 +47,7 @@
             android:theme="@style/Theme.Morph">
         </activity>
         <activity
-            android:name=".layouts.RegistrationActivity"
+            android:name=".layouts.onboarding.RegistrationActivity"
             android:theme="@style/Theme.Morph">
         </activity>
         <activity

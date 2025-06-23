@@ -1,4 +1,4 @@
-package com.wheatley.morph.layouts
+package com.wheatley.morph.layouts.onboarding
 
 import com.wheatley.morph.util.ui.ThemeManager
 import android.annotation.SuppressLint
@@ -59,6 +59,7 @@ import androidx.compose.material3.LinearWavyProgressIndicator
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.geometry.Offset
 import com.wheatley.morph.components.CustomTextField
+import com.wheatley.morph.layouts.DashboardActivity
 import com.wheatley.morph.ui.theme.ApplySystemUiRegister
 
 class RegistrationActivity : ComponentActivity() {
