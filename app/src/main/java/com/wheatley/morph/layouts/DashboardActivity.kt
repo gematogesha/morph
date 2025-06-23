@@ -1,6 +1,6 @@
 package com.wheatley.morph.layouts
 
-import ThemeManager
+import com.wheatley.morph.util.ui.ThemeManager
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
@@ -27,7 +27,6 @@ import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -36,10 +35,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -58,18 +58,16 @@ import com.wheatley.morph.layouts.settings.SettingsScreen
 import com.wheatley.morph.layouts.statistics.StatisticsScreen
 import com.wheatley.morph.ui.theme.ApplySystemUi
 import com.wheatley.morph.ui.theme.MorphTheme
-import com.wheatley.morph.update.scheduleDailyUpdateCheck
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.semantics.Role.Companion.Button
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.wheatley.morph.update.UpdateInfo
-import com.wheatley.morph.update.downloadApkWithProgress
-import com.wheatley.morph.update.fetchUpdateInfo
 import androidx.core.content.edit
+import com.wheatley.morph.components.UpdateScreen
+import com.wheatley.morph.util.update.UpdateChecker
+import kotlinx.coroutines.launch
 
 class DashboardActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
@@ -81,99 +79,44 @@ class DashboardActivity : ComponentActivity() {
             MorphTheme {
 
                 val context = LocalContext.current
-                val prefs   = context.getSharedPreferences("update_prefs", Context.MODE_PRIVATE)
+                val scope = rememberCoroutineScope()
 
-                // ← состояние боковой панели
-                val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-                val scope      = rememberCoroutineScope()
+                var showSheet by remember { mutableStateOf(false) }
+                var updateVersion by remember { mutableStateOf("") }
+                var updateChangelog by remember { mutableStateOf("") }
+                var updateDownload by remember { mutableStateOf("") }
 
-                var updateInfo  by remember { mutableStateOf<UpdateInfo?>(null) }
-                var showSheet   by remember { mutableStateOf(false) }
+                val snackbarHostState = remember { SnackbarHostState() }
 
-                /* ── подгружаем данные из SharedPreferences при старте ── */
+                // ⛳️ безопасный вызов
                 LaunchedEffect(Unit) {
-                    if (prefs.getBoolean("has_update", false)) {
-                        updateInfo = UpdateInfo(
-                            version    = prefs.getString("update_version", "") ?: "",
-                            changelog  = prefs.getString("update_changelog", "") ?: "",
-                            apkUrl     = prefs.getString("update_url", "") ?: ""
+                    scope.launch {
+                        UpdateChecker(context).checkVersion(
+                            snackbarHostState = snackbarHostState,
+                            onNewUpdate = { version, changelog, link ->
+                                updateVersion = version
+                                updateChangelog = changelog
+                                updateDownload = link
+                                showSheet = true
+                            },
+                            onFinish = { /* optional */ }
                         )
-                        showSheet = true          // покажем BottomSheet
                     }
                 }
 
-                /* ── Сам BottomSheet ── */
-                if (showSheet && updateInfo != null) {
-                    ModalBottomSheet(
-                        onDismissRequest = {
-                            showSheet = false
-                            prefs.edit { putBoolean("has_update", false) }
-                        },
-                        sheetState = sheetState,
-                        containerColor = MaterialTheme.colorScheme.surface,
-                        tonalElevation = 4.dp
-                    ) {
-                        Column(
-                            modifier = Modifier
-                                .padding(horizontal = 24.dp, vertical = 16.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Outlined.Download,
-                                contentDescription = "Обновление",
-                                tint = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier
-                                    .size(48.dp)
-                                    .align(Alignment.CenterHorizontally)
-                            )
-
-                            Spacer(Modifier.height(16.dp))
-
-                            Text(
-                                text = "Доступна новая версия ${updateInfo!!.version}",
-                                style = MaterialTheme.typography.titleLarge,
-                                fontWeight = FontWeight.Bold
-                            )
-
-                            Spacer(Modifier.height(8.dp))
-
-                            Text(
-                                text = updateInfo!!.changelog,
-                                style = MaterialTheme.typography.bodyLarge,
-                            )
-
-                            Spacer(Modifier.height(24.dp))
-
-                            Row(
-                                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                TextButton(
-                                    onClick = {
-                                        showSheet = false
-                                        prefs.edit { putBoolean("has_update", false) }
-                                    },
-                                    modifier = Modifier.weight(1f)
-                                ) {
-                                    Text("Позже")
-                                }
-
-                                Button(
-                                    onClick = {
-                                        showSheet = false
-                                        prefs.edit { putBoolean("has_update", false) }
-                                        downloadApkWithProgress(context, updateInfo!!.apkUrl)
-                                    },
-                                    modifier = Modifier.weight(1f)
-                                ) {
-                                    Text("Обновить")
-                                }
-                            }
-                        }
-                    }
-                }
-
-                /* ── основной экран ── */
+                // основной экран
                 DashboardScreen()
+
+                // модальный bottom sheet с обновлением, если нужно
+                if (showSheet) {
+                    UpdateScreen(
+                        versionName = updateVersion,
+                        changelogInfo = updateChangelog,
+                        downloadLink = updateDownload,
+                        showSheet = showSheet,
+                        onDismiss = { showSheet = false }
+                    )
+                }
             }
         }
     }
@@ -184,11 +127,9 @@ class DashboardActivity : ComponentActivity() {
 @Composable
 fun DashboardScreen() {
 
-    val context = LocalContext.current
     val navController = rememberNavController()
 
     ApplySystemUi()
-    scheduleDailyUpdateCheck(context)
 
     Scaffold(
         bottomBar = { BottomNavigationBar(navController) },
