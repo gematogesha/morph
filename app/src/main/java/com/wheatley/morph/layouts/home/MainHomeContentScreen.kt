@@ -62,13 +62,15 @@ import com.wheatley.morph.layouts.profile.ProfileActivity
 import com.wheatley.morph.model.UserPrefs
 import com.wheatley.morph.model.calculateCurrentStreak
 import com.wheatley.morph.ui.theme.LocalExColorScheme
-import com.wheatley.morph.utils.pluralDays
+import com.wheatley.morph.util.app.pluralDays
 import com.wheatley.morph.viewmodel.ChallengeViewModel
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.SolidColor
+import com.wheatley.morph.util.date.DateFormatStyle
+import com.wheatley.morph.util.date.DateFormatter
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
@@ -222,16 +224,18 @@ fun CalendarGrid(
     var currentMonth by remember { mutableStateOf(YearMonth.now()) }
     val today = LocalDate.now()
 
-    val firstDayOfMonth = currentMonth.atDay(1)
-    val firstDayOfWeek = (firstDayOfMonth.dayOfWeek.value + 6) % 7
+    val days = remember(currentMonth) {
+        val firstDayOfMonth = currentMonth.atDay(1)
+        val firstDayOfWeek = (firstDayOfMonth.dayOfWeek.value + 6) % 7
+        val daysBefore = firstDayOfMonth.minusDays(firstDayOfWeek.toLong())
+        List(42) { daysBefore.plusDays(it.toLong()) }
+    }
 
-    val daysBefore = firstDayOfMonth.minusDays(firstDayOfWeek.toLong())
-    val totalDays = 42 // 6 недель по 7 дней
-    val days = List(totalDays) { daysBefore.plusDays(it.toLong()) }
-
-    val weekdays = DayOfWeek.entries
-        .sortedBy { it.value % 7 }
-        .map { it.getDisplayName(TextStyle.SHORT, Locale("ru")) }
+    val weekdays = remember {
+        DayOfWeek.entries
+            .sortedBy { it.value % 7 }
+            .map { it.getDisplayName(TextStyle.SHORT, Locale("ru")) }
+    }
 
     CardBig(
         modifier = Modifier
@@ -335,5 +339,4 @@ fun CalendarGrid(
             }
         }
     }
-
 }

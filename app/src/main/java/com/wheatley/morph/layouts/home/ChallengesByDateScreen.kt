@@ -33,6 +33,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,8 +49,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.media3.common.util.UnstableApi
 import com.wheatley.morph.ui.theme.ApplySystemUi
 import com.wheatley.morph.ui.theme.LocalExColorScheme
-import com.wheatley.morph.utils.color
-import com.wheatley.morph.utils.isSameDay
+import com.wheatley.morph.util.app.color
+import com.wheatley.morph.util.app.isSameDay
+import com.wheatley.morph.util.date.DateFormatStyle
+import com.wheatley.morph.util.date.DateFormatter
+import com.wheatley.morph.util.setting.SettingsKeys
+import com.wheatley.morph.util.setting.SettingsManager
 import com.wheatley.morph.viewmodel.ChallengeViewModel
 import java.time.DayOfWeek
 import java.time.LocalDate
@@ -86,14 +91,20 @@ fun ChallengesByDateScreen(
 
     val challenges = if (status == "inProgress") inProgress else completed
 
+    val relativeDate = SettingsManager.getBoolean(context, SettingsKeys.RELATIVE_TIMESTAMPS, true)
+
     fun formatRelativeDate(date: LocalDate, reference: LocalDate = LocalDate.now()): String {
-        return when (date) {
-            reference -> "Сегодня"
-            reference.minusDays(1) -> "Вчера"
-            reference.minusDays(2) -> "Позавчера"
-            reference.plusDays(1) -> "Завтра"
-            reference.plusDays(2) -> "Послезавтра"
-            else -> date.format(DateTimeFormatter.ofPattern("d MMMM", Locale("ru")))
+        return if (relativeDate) {
+            when (date) {
+                reference -> "Сегодня"
+                reference.minusDays(1) -> "Вчера"
+                reference.minusDays(2) -> "Позавчера"
+                reference.plusDays(1) -> "Завтра"
+                reference.plusDays(2) -> "Послезавтра"
+                else -> DateFormatter.format(date, DateFormatStyle.DAY_MONTH)
+            }
+        } else {
+            DateFormatter.format(date, DateFormatStyle.DAY_MONTH)
         }
     }
 
