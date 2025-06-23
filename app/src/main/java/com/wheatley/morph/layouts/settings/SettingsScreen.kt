@@ -79,7 +79,7 @@ fun SettingsScreen() {
                 versionName?.replace(Regex("\\(\\d{2}\\.\\d{2}\\.\\d{4}\\)\$"), "")?.trim()
             }",
             icon = Icons.Outlined.Info,
-            activityClass = InfoActivity::class.java
+            activityClass = AboutActivity::class.java
         )
     )
 
