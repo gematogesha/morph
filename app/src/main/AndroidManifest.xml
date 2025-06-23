@@ -22,6 +22,17 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Morph"
         tools:targetApi="33">
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
         <activity
             android:name=".layouts.MainActivity"
             android:exported="true"
@@ -37,10 +48,6 @@
         </activity>
         <activity
             android:name=".layouts.RegistrationActivity"
-            android:theme="@style/Theme.Morph">
-        </activity>
-        <activity
-            android:name=".layouts.home.ChallengesListActivity"
             android:theme="@style/Theme.Morph">
         </activity>
         <activity
@@ -60,7 +67,7 @@
             android:theme="@style/Theme.Morph">
         </activity>
         <activity
-            android:name=".layouts.settings.InfoActivity"
+            android:name=".layouts.settings.AboutActivity"
             android:theme="@style/Theme.Morph">
         </activity>
     </application>
