@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Morph</string>
+    <string name="channel_app_updates">Обновления приложения</string>
+    <string name="channel_app_updates_description">Уведомления о новых версиях и установке</string>
+    <string name="update_check_eol">Обновление невозможно</string>
+    <string name="update_check_no_new_updates">Нет доступных обновлений</string>
 </resources>
