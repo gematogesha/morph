@@ -59,7 +59,7 @@
             android:theme="@style/Theme.Morph">
         </activity>
         <activity
-            android:name=".layouts.settings.DisplayActivity"
+            android:name=".layouts.settings.AppearanceActivity"
             android:theme="@style/Theme.Morph">
         </activity>
         <activity
