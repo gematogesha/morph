@@ -65,7 +65,7 @@ fun SettingsScreen() {
             title = "Отображение",
             subtitle = "Тема и пр.",
             icon = Icons.Outlined.Palette,
-            activityClass = DisplayActivity::class.java
+            activityClass = AppearanceActivity::class.java
         ),
         MenuItem(
             title = "Уведомления",
