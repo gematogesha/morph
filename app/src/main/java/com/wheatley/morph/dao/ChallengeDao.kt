@@ -37,6 +37,9 @@ interface ChallengeDao {
     @Query("SELECT * FROM challenge_entries")
     fun getAllEntries(): Flow<List<ChallengeEntry>>
 
+    @Update
+    suspend fun updateChallenge(challenge: Challenge)
+
 }
 
 @Database(entities = [Challenge::class, ChallengeEntry::class], version = 1)

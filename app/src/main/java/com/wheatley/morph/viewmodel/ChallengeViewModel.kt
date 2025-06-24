@@ -23,6 +23,8 @@ class ChallengeRepository(val dao: ChallengeDao) {
 
     suspend fun addChallenge(name: String, emoji: String, duration: Int = 1, color: ChallengeColor) = dao.insertChallenge(Challenge(name = name, emoji = emoji, duration = duration, color = color))
 
+    suspend fun updateChallenge(challenge: Challenge) = dao.updateChallenge(challenge)
+
     suspend fun deleteChallenge(challenge: Challenge) = dao.deleteChallenge(challenge)
 
     suspend fun toggleDone(challengeId: Long, date: Date, done: Boolean) {
@@ -36,9 +38,14 @@ class ChallengeRepository(val dao: ChallengeDao) {
 
         val completedDays = entries.count { it.done }
 
-        if (completedDays >= challenge.duration && challenge.status != ChallengeStatus.COMPLETED) {
-            val updated = challenge.copy(status = ChallengeStatus.COMPLETED)
-            dao.insertChallenge(updated)
+        val newStatus = when {
+            completedDays >= challenge.duration -> ChallengeStatus.COMPLETED
+            else -> ChallengeStatus.IN_PROGRESS
+        }
+
+        if (newStatus != challenge.status) {
+            val updated = challenge.copy(status = newStatus)
+            dao.updateChallenge(updated)
         }
     }
 
@@ -52,7 +59,7 @@ class ChallengeViewModel(application: Application) : AndroidViewModel(applicatio
     private val db = Room.databaseBuilder(application, AppDatabase::class.java, "challenge-db").build()
     private val repo = ChallengeRepository(db.challengeDao())
 
-    val challenges: Flow<List<Challenge>> = repo.allChallenges()
+    val allChallenges: Flow<List<Challenge>> = repo.allChallenges()
 
     fun addChallenge(
         name: String,
