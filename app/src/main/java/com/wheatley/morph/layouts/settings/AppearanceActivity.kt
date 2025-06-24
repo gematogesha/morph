@@ -27,10 +27,12 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.ToggleButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -48,12 +50,12 @@ class AppearanceActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            val selectedTheme = rememberSaveable { mutableStateOf("system") }
+            var selectedTheme by rememberSaveable { mutableStateOf("system") }
             val context = applicationContext
 
             val themeSharedPreferences =
                 context.getSharedPreferences("app_preferences", MODE_PRIVATE)
-            selectedTheme.value = themeSharedPreferences.getString("theme", "system") ?: "system"
+            selectedTheme = themeSharedPreferences.getString("theme", "system") ?: "system"
 
             enableEdgeToEdge()
             MorphTheme {
@@ -163,15 +165,15 @@ fun AppearanceScreen(
                             Text("\"Сегодня\" вместо \"${DateFormatter.format(style =  DateFormatStyle.DEFAULT)}\"")
                         },
                         trailingContent = {
-                            val useRelativeTimestamps = rememberSaveable {
+                            var useRelativeTimestamps by rememberSaveable {
                                 mutableStateOf(
                                     SettingsManager.getBoolean(context, SettingsKeys.RELATIVE_TIMESTAMPS, true)
                                 )
                             }
                             Switch(
-                                checked = useRelativeTimestamps.value,
+                                checked = useRelativeTimestamps,
                                 onCheckedChange = {
-                                    useRelativeTimestamps.value = it
+                                    useRelativeTimestamps = it
                                     SettingsManager.setBoolean(context, SettingsKeys.RELATIVE_TIMESTAMPS, it)
                                 }
                             )

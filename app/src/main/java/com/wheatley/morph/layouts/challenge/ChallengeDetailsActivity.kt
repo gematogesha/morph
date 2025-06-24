@@ -37,13 +37,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
+import com.wheatley.morph.util.app.isSameDay
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.wheatley.morph.layouts.add.isSameDay
 import com.wheatley.morph.model.ChallengeEntry
 import com.wheatley.morph.ui.theme.ApplySystemUi
 import com.wheatley.morph.ui.theme.MorphTheme

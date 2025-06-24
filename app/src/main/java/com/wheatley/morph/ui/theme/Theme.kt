@@ -175,10 +175,10 @@ val extendedLight = ExtendedColorScheme(
 
 val extendedDark = ExtendedColorScheme(
     primary = ColorFamily(
-        color = primary,
-        secondColor = lighten(primary, 0.35f),
-        colorContainer = lighten(primary, 0.8f),
-        onColorContainer = darken(primary, 0.05f)
+        color = darken(primary, 0.5f),
+        secondColor = darken(primary, 0.2f),
+        colorContainer = darken(primary, 0.6f),
+        onColorContainer = darken(primary, 0.2f)
     ),
     green = ColorFamily(
         color = darken(green, 0.5f),
@@ -264,7 +264,7 @@ fun MorphTheme(
 
 @Composable
 fun isDarkThemeEnabled(): Boolean {
-    return when (ThemeManager.currentTheme.value) {
+    return when (ThemeManager.currentTheme) {
         "light" -> false
         "dark" -> true
         else -> isSystemInDarkTheme()

@@ -148,15 +148,13 @@ fun MainHomeContentScreen(
                     contentPadding = innerPadding,
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(top = 8.dp)
                         .padding(horizontal = 16.dp)
                 ) {
 
                     item {
                         CardBig(
                             modifier = Modifier.padding(bottom = 20.dp),
-                            colorTop = LocalExColorScheme.current.lightPurple.colorContainer,
-                            colorBottom = LocalExColorScheme.current.lightPurple.colorContainer
+                            color = LocalExColorScheme.current.lightPurple.colorContainer,
                         ) {
                             Column(){
                                 Text(

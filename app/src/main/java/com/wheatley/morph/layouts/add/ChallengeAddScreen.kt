@@ -4,6 +4,10 @@ import android.annotation.SuppressLint
 import android.icu.util.Calendar
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -29,6 +33,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.Button
@@ -75,6 +80,7 @@ import com.wheatley.morph.ui.theme.ColorFamily
 import com.wheatley.morph.ui.theme.LocalExColorScheme
 import com.wheatley.morph.viewmodel.ChallengeViewModel
 import kotlinx.coroutines.launch
+import com.wheatley.morph.util.app.pluralDays
 import java.util.Date
 
 
@@ -85,7 +91,7 @@ fun ChallengeAddScreen() {
     val vm: ChallengeViewModel = viewModel()
     var challengeName by remember { mutableStateOf("") }
     var challengeEmoji by remember { mutableStateOf("") }
-    var challengeDuration by remember { mutableIntStateOf(21) }
+    var challengeDuration by remember { mutableIntStateOf(7) }
     var challengeColor by remember { mutableStateOf(ChallengeColor.LIGHTPURPLE) }
 
     val snackbarHostState = remember { SnackbarHostState() }
@@ -101,13 +107,13 @@ fun ChallengeAddScreen() {
                     Text("Добавить достижение")
                 },
                 actions = {
-                    TextButton(
+                    IconButton(
                         onClick = {
                             if (challengeName.isNotBlank()) {
                                 vm.addChallenge(challengeName.trim(), challengeEmoji.trim(), challengeDuration, challengeColor)
                                 challengeName = ""
                                 challengeEmoji = ""
-                                challengeDuration = 21
+                                challengeDuration = 7
                                 challengeColor = ChallengeColor.LIGHTPURPLE
 
                                 scope.launch {
@@ -121,10 +127,7 @@ fun ChallengeAddScreen() {
                             }
                         },
                     ) {
-                        Text(
-                            text = "Сохранить",
-                            fontWeight = FontWeight.Bold
-                        )
+                        Icon(Icons.Default.Save, contentDescription = "Save",)
                     }
                 },
                 scrollBehavior = scrollBehavior
@@ -169,6 +172,12 @@ fun ChallengesAdd(
     fun filterSingleEmoji(input: String): String {
         return emojiRegex.find(input)?.value ?: ""
     }
+
+    val daysList = listOf(7, 14, 21, null)
+    val daysColorList = listOf(LocalExColorScheme.current.yellow, LocalExColorScheme.current.pink, LocalExColorScheme.current.orange, LocalExColorScheme.current.bluePurple, )
+    var currentDay by remember { mutableIntStateOf(0) }
+
+    var showDurationField by remember { mutableStateOf(false) }
 
     val exColors = LocalExColorScheme.current
 
@@ -230,20 +239,6 @@ fun ChallengesAdd(
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
             }
-            item {
-                CustomTextField(
-                    value = if (duration == 0) "" else duration.toString(),
-                    onValueChange = {
-                        if (it.length <= 2 && it.all { char -> char.isDigit() }) {
-                            val number = it.toIntOrNull() ?: 0
-                            onDurationChange(number)
-                        }
-                    },
-                    label = "Продолжительность",
-                    modifier = Modifier.padding(bottom = 16.dp),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-                )
-            }
             item{
                 ColorPicker(
                     colorMap = colorMap,
@@ -252,6 +247,7 @@ fun ChallengesAdd(
                 )
             }
             item{
+
                 Row(
                     modifier = Modifier
                         .padding(bottom = 16.dp)
@@ -308,18 +304,26 @@ fun ChallengesAdd(
                                 .clip(CircleShape)
                                 .background(
                                     brush = Brush.verticalGradient(
-                                        colors = listOf(LocalExColorScheme.current.orange.secondColor, LocalExColorScheme.current.orange.color)
+                                        colors = listOf(daysColorList[currentDay].secondColor, daysColorList[currentDay].color)
                                     )
                                 )
-
                                 .clickable(
-                                    onClick = {  },
+                                    onClick = {
+                                        currentDay = (currentDay + 1) % daysList.size
+                                        daysList[currentDay]?.let { onDurationChange(it) }
+                                        if (daysList[currentDay] == null) {
+                                            showDurationField = true
+                                        } else {
+                                            showDurationField = false
+                                        }
+
+                                    },
                                 ),
                             contentAlignment = Alignment.Center,
 
                             ){
                             Icon(
-                                imageVector = Icons.Default.Star,
+                                imageVector = Icons.Outlined.Star,
                                 contentDescription = null,
                                 tint = Color.White
                             )
@@ -330,11 +334,31 @@ fun ChallengesAdd(
                         ){
                             Text("Количество")
                             Text(
-                                text = "${duration} раз",
-                                color = LocalExColorScheme.current.orange.color
+                                text = pluralDays(duration),
+                                color = daysColorList[currentDay].color
                             )
                         }
                     }
+                }
+            }
+            item {
+                AnimatedVisibility(
+                    visible = showDurationField,
+                    enter = slideInVertically() + fadeIn(),
+                    exit = slideOutVertically() + fadeOut()
+                ) {
+                    CustomTextField(
+                        value = if (duration == 0) "" else duration.toString(),
+                        onValueChange = {
+                            if (it.length <= 2 && it.all { char -> char.isDigit() }) {
+                                val number = it.toIntOrNull() ?: 0
+                                onDurationChange(number)
+                            }
+                        },
+                        label = "Количество",
+                        modifier = Modifier.padding(bottom = 16.dp),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                    )
                 }
             }
         }
@@ -381,13 +405,14 @@ fun ColorPicker(
 
         if (visible) {
             ModalBottomSheet(
+                dragHandle = null,
                 onDismissRequest = {
                     visible = false
                 },
                 sheetState = sheetState
             ) {
                 Text(
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp),
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 32.dp),
                     text = "Выбери цвет, который тебе нравится",
                     color = MaterialTheme.colorScheme.onSurface,
                     style = MaterialTheme.typography.bodyLarge,
@@ -475,12 +500,4 @@ fun ColorPicker(
             }
         }
     }
-}
-
-// вспомогательный extension для сравнения даты без времени
-fun Date.isSameDay(other: Date): Boolean {
-    val cal1 = Calendar.getInstance().apply { time = this@isSameDay }
-    val cal2 = Calendar.getInstance().apply { time = other }
-    return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR)
-            && cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR)
 }

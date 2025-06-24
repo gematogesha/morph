@@ -121,21 +121,14 @@ fun ChallengeCard(
     CardBig(
         
     ) {
-        CardBadge(
-            modifier = TODO(),
-            icon = TODO(),
-            colorTop = TODO()
-        ) {
-            
-        }
+
     }
 }
 
 @Composable
 fun CardBig(
     modifier: Modifier = Modifier,
-    colorTop: Color = MaterialTheme.colorScheme.surfaceContainer,
-    colorBottom: Color = MaterialTheme.colorScheme.surfaceContainer,
+    color: Color = MaterialTheme.colorScheme.surfaceContainer,
     content: @Composable () -> Unit = {},
 ) {
     Card(
@@ -146,11 +139,7 @@ fun CardBig(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(
-                    brush = Brush.verticalGradient(
-                        colors = listOf(colorTop, colorBottom)
-                    )
-                ),
+                .background(color),
         ) {
             Row(
                 modifier = Modifier

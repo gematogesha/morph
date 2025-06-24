@@ -30,31 +30,3 @@ fun PrimaryButton(
         Text(text)
     }
 }
-
-@Composable
-fun SecondaryButton(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-    text: String
-) {
-    OutlinedButton(
-        onClick = onClick,
-        modifier = modifier.size(48.dp),
-        shape = MaterialTheme.shapes.extraLarge,
-        enabled = enabled,
-        colors = ButtonDefaults.outlinedButtonColors(
-            containerColor = MaterialTheme.colorScheme.secondaryContainer,
-            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-            disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant
-        ),
-        border = ButtonDefaults.outlinedButtonBorder.copy(
-            brush = ButtonDefaults.outlinedButtonBorder.brush
-        )
-    ) {
-        Text(
-            text = text,
-            style = MaterialTheme.typography.labelLarge
-        )
-    }
-}

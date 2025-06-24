@@ -16,7 +16,6 @@ object SettingsManager {
         prefs.edit { putBoolean(key, value) }
     }
 
-    // В будущем можно добавить:
     // fun getInt(...)
     // fun getString(...)
     // fun observeFlow(...) с DataStore и т.д.
@@ -26,5 +25,4 @@ object SettingsKeys {
     const val RELATIVE_TIMESTAMPS = "relative_timestamps"
     const val SHOW_COMPLETED_TASKS = "show_completed_tasks"
     const val USE_ANIMATIONS = "use_animations"
-    // и т.д.
 }
