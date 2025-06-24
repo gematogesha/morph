@@ -23,6 +23,7 @@ object SettingsManager {
 
 object SettingsKeys {
     const val RELATIVE_TIMESTAMPS = "relative_timestamps"
+    const val TRUE_DARK_COLOR = "true_dark_color"
     const val SHOW_COMPLETED_TASKS = "show_completed_tasks"
     const val USE_ANIMATIONS = "use_animations"
 }

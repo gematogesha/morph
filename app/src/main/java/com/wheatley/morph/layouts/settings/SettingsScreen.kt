@@ -32,6 +32,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.wheatley.morph.components.SettingsItem
 import com.wheatley.morph.ui.theme.ApplySystemUi
 
 data class MenuItem(
@@ -100,29 +101,21 @@ fun SettingsScreen() {
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     items(menuItems) { menuItem ->
-                        Row(
-                            Modifier
-                                .fillMaxWidth()
-                                .clickable(
-                                    onClick = {
-                                        val intent = Intent(context, menuItem.activityClass)
-                                        context.startActivity(intent)
-                                    },
-                                ),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            ListItem(
-                                headlineContent = { Text(menuItem.title) },
-                                supportingContent = { Text(menuItem.subtitle) },
-                                leadingContent = {
-                                    Icon(
-                                        menuItem.icon,
-                                        contentDescription = "Info",
-                                        tint = MaterialTheme.colorScheme.primary
-                                    )
-                                }
-                            )
-                        }
+                        SettingsItem (
+                            title = menuItem.title,
+                            subTitle = menuItem.subtitle,
+                            action = {
+                                val intent = Intent(context, menuItem.activityClass)
+                                context.startActivity(intent)
+                            },
+                            icon = {
+                                Icon(
+                                    menuItem.icon,
+                                    contentDescription = "Info",
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                        )
                     }
                 }
             }

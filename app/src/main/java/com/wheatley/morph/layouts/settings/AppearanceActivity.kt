@@ -1,13 +1,16 @@
 package com.wheatley.morph.layouts.settings
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -33,9 +36,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.wheatley.morph.components.SettingsItem
+import com.wheatley.morph.components.SettingsLabel
 import com.wheatley.morph.ui.theme.ApplySystemUi
 import com.wheatley.morph.ui.theme.MorphTheme
 import com.wheatley.morph.util.date.DateFormatStyle
@@ -81,6 +87,18 @@ fun AppearanceScreen(
 
     val context = LocalContext.current
 
+    var useRelativeTimestamps by rememberSaveable {
+        mutableStateOf(
+            SettingsManager.getBoolean(context, SettingsKeys.RELATIVE_TIMESTAMPS, true)
+        )
+    }
+
+    var useTrueDarkColor by rememberSaveable {
+        mutableStateOf(
+            SettingsManager.getBoolean(context, SettingsKeys.TRUE_DARK_COLOR, false)
+        )
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -105,15 +123,7 @@ fun AppearanceScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 item {
-                    ListItem(
-                        modifier = Modifier.height(40.dp),
-                        headlineContent = {
-                            Text(
-                                text = "Тема",
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                        }
-                    )
+                    SettingsLabel("Тема")
                 }
 
                 item {
@@ -148,33 +158,57 @@ fun AppearanceScreen(
                 }
 
                 item {
-                    ListItem(
-                        modifier = Modifier.height(40.dp),
-                        headlineContent = {
-                            Text(
-                                text = "Отображение",
-                                color = MaterialTheme.colorScheme.primary
+                    SettingsItem(
+                        title = "Темный режим с чистым черным",
+                        action = {
+                            useTrueDarkColor = !useTrueDarkColor
+                            SettingsManager.setBoolean(
+                                context,
+                                SettingsKeys.RELATIVE_TIMESTAMPS,
+                                useTrueDarkColor
+                            )
+                        },
+                        trailingContent = {
+                            Switch(
+                                checked = useTrueDarkColor,
+                                onCheckedChange = {
+                                    useTrueDarkColor = it
+                                    SettingsManager.setBoolean(
+                                        context,
+                                        SettingsKeys.RELATIVE_TIMESTAMPS,
+                                        it
+                                    )
+                                }
                             )
                         }
                     )
                 }
+
                 item {
-                    ListItem(
-                        headlineContent = { Text("Относительные временные метки") },
-                        supportingContent = {
-                            Text("\"Сегодня\" вместо \"${DateFormatter.format(style =  DateFormatStyle.DEFAULT)}\"")
+                    SettingsLabel("Отображение")
+                }
+                item {
+                    SettingsItem(
+                        title = "Относительные временные метки",
+                        subTitle = "\"Сегодня\" вместо \"${DateFormatter.format(style = DateFormatStyle.DEFAULT)}\"",
+                        action = {
+                            useRelativeTimestamps = !useRelativeTimestamps
+                            SettingsManager.setBoolean(
+                                context,
+                                SettingsKeys.RELATIVE_TIMESTAMPS,
+                                useRelativeTimestamps
+                            )
                         },
                         trailingContent = {
-                            var useRelativeTimestamps by rememberSaveable {
-                                mutableStateOf(
-                                    SettingsManager.getBoolean(context, SettingsKeys.RELATIVE_TIMESTAMPS, true)
-                                )
-                            }
                             Switch(
                                 checked = useRelativeTimestamps,
                                 onCheckedChange = {
                                     useRelativeTimestamps = it
-                                    SettingsManager.setBoolean(context, SettingsKeys.RELATIVE_TIMESTAMPS, it)
+                                    SettingsManager.setBoolean(
+                                        context,
+                                        SettingsKeys.RELATIVE_TIMESTAMPS,
+                                        it
+                                    )
                                 }
                             )
                         }
