@@ -1,9 +1,7 @@
 package com.wheatley.morph.layouts.add
 
 import android.annotation.SuppressLint
-import android.icu.util.Calendar
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
@@ -32,11 +30,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Save
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Star
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
@@ -49,7 +44,6 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -67,23 +61,22 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.media3.common.util.Log
+import androidx.media3.common.util.UnstableApi
 import com.wheatley.morph.R
-import com.wheatley.morph.components.CardBadge
 import com.wheatley.morph.components.CustomTextField
 import com.wheatley.morph.model.ChallengeColor
 import com.wheatley.morph.ui.theme.ColorFamily
 import com.wheatley.morph.ui.theme.LocalExColorScheme
-import com.wheatley.morph.viewmodel.ChallengeViewModel
-import kotlinx.coroutines.launch
 import com.wheatley.morph.util.app.pluralDays
-import java.util.Date
+import com.wheatley.morph.viewmodel.ChallengeViewModel
+import com.wheatley.morph.util.system.SnackbarHelper
+import kotlinx.coroutines.launch
 
-
+@androidx.annotation.OptIn(UnstableApi::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -99,74 +92,6 @@ fun ChallengeAddScreen() {
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
-    Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text("Добавить достижение")
-                },
-                actions = {
-                    IconButton(
-                        onClick = {
-                            if (challengeName.isNotBlank()) {
-                                vm.addChallenge(challengeName.trim(), challengeEmoji.trim(), challengeDuration, challengeColor)
-                                challengeName = ""
-                                challengeEmoji = ""
-                                challengeDuration = 7
-                                challengeColor = ChallengeColor.LIGHTPURPLE
-
-                                scope.launch {
-                                    snackbarHostState.showSnackbar("Достижение добавлено")
-                                }
-                            }
-                            else {
-                                scope.launch {
-                                    snackbarHostState.showSnackbar("Не все поля заполнены")
-                                }
-                            }
-                        },
-                    ) {
-                        Icon(Icons.Default.Save, contentDescription = "Save",)
-                    }
-                },
-                scrollBehavior = scrollBehavior
-            )
-        },
-        snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState) { data ->
-                Snackbar(snackbarData = data)
-            }
-        },
-        content = { innerPadding ->
-            ChallengesAdd(
-                name = challengeName,
-                onNameChange = { challengeName = it },
-                emoji = challengeEmoji,
-                onEmojiChange = { challengeEmoji = it },
-                duration = challengeDuration,
-                onDurationChange = { challengeDuration = it },
-                color = challengeColor,
-                onColorChange = { challengeColor = it },
-                innerPadding = innerPadding
-            )
-        }
-    )
-}
-
-@Composable
-fun ChallengesAdd(
-    name: String,
-    onNameChange: (String) -> Unit,
-    emoji: String,
-    onEmojiChange: (String) -> Unit,
-    duration: Int,
-    onDurationChange: (Int) -> Unit,
-    color: ChallengeColor,
-    onColorChange: (ChallengeColor) -> Unit,
-    innerPadding: PaddingValues
-) {
-
     val emojiRegex = Regex("[\uD83C-\uDBFF\uDC00-\uDFFF]+")
 
     fun filterSingleEmoji(input: String): String {
@@ -174,7 +99,12 @@ fun ChallengesAdd(
     }
 
     val daysList = listOf(7, 14, 21, null)
-    val daysColorList = listOf(LocalExColorScheme.current.yellow, LocalExColorScheme.current.pink, LocalExColorScheme.current.orange, LocalExColorScheme.current.bluePurple, )
+    val daysColorList = listOf(
+        LocalExColorScheme.current.yellow,
+        LocalExColorScheme.current.pink,
+        LocalExColorScheme.current.orange,
+        LocalExColorScheme.current.bluePurple
+    )
     var currentDay by remember { mutableIntStateOf(0) }
 
     var showDurationField by remember { mutableStateOf(false) }
@@ -194,176 +124,220 @@ fun ChallengesAdd(
         )
     }
 
-    Surface(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        LazyColumn(
-            contentPadding = innerPadding,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 16.dp)
-        ) {
-            item {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        modifier = Modifier
-                            .size(200.dp),
-                        painter = painterResource(id = R.drawable.ic_launcher_foreground),
-                        tint = Color.Unspecified,
-                        contentDescription = "Logo"
-                    )
-                }
-            }
-            item {
-                CustomTextField(
-                    value = name,
-                    onValueChange = {
-                        if (it.length <= 20) onNameChange(it)
-                    },
-                    label = "Название",
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
-            }
-            item{
-                CustomTextField(
-                    value = emoji,
-                    onValueChange = { input ->
-                        val filtered = filterSingleEmoji(input)
-                        onEmojiChange(filtered.take(2)) // даже если пусто — очищаем
-                    },
-                    label = "Эмодзи",
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
-            }
-            item{
-                ColorPicker(
-                    colorMap = colorMap,
-                    color = color,
-                    onColorChange = onColorChange
-                )
-            }
-            item{
+    Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text("Добавить достижение")
+                },
+                actions = {
+                    IconButton(
+                        onClick = {
+                            if (challengeName.isBlank()) {
+                                scope.launch {
+                                    snackbarHostState.showSnackbar("message")
+                                    //SnackbarHelper .show(snackbarHostState, "Не все поля заполнены")
+                                    Log.d("ChallengeAddScreen", "Не все поля заполнены")
+                                }
+                                return@IconButton
+                            }
+                            scope.launch {
+                                vm.addChallenge(challengeName.trim(), challengeEmoji.trim(), challengeDuration, challengeColor)
+                                challengeName = ""
+                                challengeEmoji = ""
+                                challengeDuration = 7
+                                challengeColor = ChallengeColor.LIGHTPURPLE
 
-                Row(
-                    modifier = Modifier
-                        .padding(bottom = 16.dp)
-                        .fillMaxSize(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Row(modifier = Modifier.weight(1f)) {
-                        Box(
-                            modifier = Modifier
-                                .padding(end = 16.dp)
-                                .height(48.dp)
-                                .width(48.dp)
-                                .aspectRatio(1f)
-                                .clip(CircleShape)
-                                .background(
-                                    brush = Brush.verticalGradient(
-                                        colors = listOf(LocalExColorScheme.current.green.secondColor, LocalExColorScheme.current.green.color)
-                                    )
-                                )
-                                .clickable(
-                                    enabled = false,
-                                    onClick = {  }
-                                ),
-                            contentAlignment = Alignment.Center,
-
-                            ){
-                            Icon(
-                                imageVector = Icons.Default.CalendarMonth,
-                                contentDescription = null,
-                                tint = Color.White
-                            )
-                        }
-                        Column(
-                            modifier = Modifier.weight(1f),
-
-                            ){
-                            Text("Дата")
-                            Text(
-                                text = "Сегодня",
-                                color = LocalExColorScheme.current.green.color
-                            )
-                        }
-                    }
-                    Row(
-                        modifier = Modifier.weight(1f),
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .height(48.dp)
-                                .padding(end = 16.dp)
-                                .width(48.dp)
-                                .aspectRatio(1f)
-                                .clip(CircleShape)
-                                .background(
-                                    brush = Brush.verticalGradient(
-                                        colors = listOf(daysColorList[currentDay].secondColor, daysColorList[currentDay].color)
-                                    )
-                                )
-                                .clickable(
-                                    onClick = {
-                                        currentDay = (currentDay + 1) % daysList.size
-                                        daysList[currentDay]?.let { onDurationChange(it) }
-                                        if (daysList[currentDay] == null) {
-                                            showDurationField = true
-                                        } else {
-                                            showDurationField = false
-                                        }
-
-                                    },
-                                ),
-                            contentAlignment = Alignment.Center,
-
-                            ){
-                            Icon(
-                                imageVector = Icons.Outlined.Star,
-                                contentDescription = null,
-                                tint = Color.White
-                            )
-                        }
-                        Column(
-                            modifier = Modifier.weight(1f),
-
-                        ){
-                            Text("Количество")
-                            Text(
-                                text = pluralDays(duration),
-                                color = daysColorList[currentDay].color
-                            )
-                        }
-                    }
-                }
-            }
-            item {
-                AnimatedVisibility(
-                    visible = showDurationField,
-                    enter = slideInVertically() + fadeIn(),
-                    exit = slideOutVertically() + fadeOut()
-                ) {
-                    CustomTextField(
-                        value = if (duration == 0) "" else duration.toString(),
-                        onValueChange = {
-                            if (it.length <= 2 && it.all { char -> char.isDigit() }) {
-                                val number = it.toIntOrNull() ?: 0
-                                onDurationChange(number)
+                                SnackbarHelper.show(snackbarHostState, "Достижение добавлено")
                             }
                         },
-                        label = "Количество",
-                        modifier = Modifier.padding(bottom = 16.dp),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-                    )
+                    ) {
+                        Icon(Icons.Default.Save, contentDescription = "Save")
+                    }
+                },
+                scrollBehavior = scrollBehavior
+            )
+        },
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState) { data ->
+                Snackbar(snackbarData = data)
+            }
+        },
+        content = { innerPadding ->
+            Surface(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                LazyColumn(
+                    contentPadding = innerPadding,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 16.dp)
+                ) {
+                    item {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                modifier = Modifier
+                                    .size(200.dp),
+                                painter = painterResource(id = R.drawable.ic_launcher_foreground),
+                                tint = Color.Unspecified,
+                                contentDescription = "Logo"
+                            )
+                        }
+                    }
+                    item {
+                        CustomTextField(
+                            value = challengeName,
+                            onValueChange = {
+                                if (it.length <= 20) challengeName = it
+                            },
+                            label = "Название",
+                            modifier = Modifier.padding(bottom = 16.dp)
+                        )
+                    }
+                    item{
+                        CustomTextField(
+                            value = challengeEmoji,
+                            onValueChange = { input ->
+                                val filtered = filterSingleEmoji(input)
+                                challengeEmoji = filtered.take(2) // даже если пусто — очищаем
+                            },
+                            label = "Эмодзи",
+                            modifier = Modifier.padding(bottom = 16.dp)
+                        )
+                    }
+                    item{
+                        ColorPicker(
+                            colorMap = colorMap,
+                            color = challengeColor,
+                            onColorChange = { challengeColor = it}
+                        )
+                    }
+                    item{
+
+                        Row(
+                            modifier = Modifier
+                                .padding(bottom = 16.dp)
+                                .fillMaxSize(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Row(modifier = Modifier.weight(1f)) {
+                                Box(
+                                    modifier = Modifier
+                                        .padding(end = 16.dp)
+                                        .height(48.dp)
+                                        .width(48.dp)
+                                        .aspectRatio(1f)
+                                        .clip(CircleShape)
+                                        .background(
+                                            brush = Brush.verticalGradient(
+                                                colors = listOf(LocalExColorScheme.current.green.secondColor, LocalExColorScheme.current.green.color)
+                                            )
+                                        )
+                                        .clickable(
+                                            enabled = false,
+                                            onClick = {  }
+                                        ),
+                                    contentAlignment = Alignment.Center,
+
+                                    ){
+                                    Icon(
+                                        imageVector = Icons.Default.CalendarMonth,
+                                        contentDescription = null,
+                                        tint = Color.White
+                                    )
+                                }
+                                Column(
+                                    modifier = Modifier.weight(1f),
+
+                                    ){
+                                    Text("Дата")
+                                    Text(
+                                        text = "Сегодня",
+                                        color = LocalExColorScheme.current.green.color
+                                    )
+                                }
+                            }
+                            Row(
+                                modifier = Modifier.weight(1f),
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .height(48.dp)
+                                        .padding(end = 16.dp)
+                                        .width(48.dp)
+                                        .aspectRatio(1f)
+                                        .clip(CircleShape)
+                                        .background(
+                                            brush = Brush.verticalGradient(
+                                                colors = listOf(daysColorList[currentDay].secondColor, daysColorList[currentDay].color)
+                                            )
+                                        )
+                                        .clickable(
+                                            onClick = {
+                                                currentDay = (currentDay + 1) % daysList.size
+                                                daysList[currentDay]?.let { challengeDuration = it }
+                                                if (daysList[currentDay] == null) {
+                                                    showDurationField = true
+                                                } else {
+                                                    showDurationField = false
+                                                }
+
+                                            },
+                                        ),
+                                    contentAlignment = Alignment.Center,
+
+                                    ){
+                                    Icon(
+                                        imageVector = Icons.Outlined.Star,
+                                        contentDescription = null,
+                                        tint = Color.White
+                                    )
+                                }
+                                Column(
+                                    modifier = Modifier.weight(1f),
+
+                                    ){
+                                    Text("Количество")
+                                    Text(
+                                        text = pluralDays(challengeDuration),
+                                        color = daysColorList[currentDay].color
+                                    )
+                                }
+                            }
+                        }
+                    }
+                    item {
+                        AnimatedVisibility(
+                            visible = showDurationField,
+                            enter = slideInVertically() + fadeIn(),
+                            exit = slideOutVertically() + fadeOut()
+                        ) {
+                            CustomTextField(
+                                value = if (challengeDuration == 0) "" else challengeDuration.toString(),
+                                onValueChange = {
+                                    if (it.length <= 2 && it.all { char -> char.isDigit() }) {
+                                        val number = it.toIntOrNull() ?: 0
+                                        challengeDuration = number
+                                    }
+                                },
+                                label = "Количество",
+                                modifier = Modifier.padding(bottom = 16.dp),
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                            )
+                        }
+                    }
                 }
             }
         }
-    }
+    )
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -457,46 +431,6 @@ fun ColorPicker(
                     }
 
                 }
-                /*AnimatedVisibility(visible, modifier = Modifier.animateContentSize()) {
-                    LazyVerticalGrid(
-                        columns = GridCells.Fixed(5),
-                        modifier = Modifier
-                            .height(150.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                    ) {
-                        items(colorMap.entries.toList()) { (colorEnum, colorValue) ->
-                            Box(
-                                contentAlignment = Alignment.Center,
-                                modifier = Modifier
-                                    .padding(8.dp)
-                                    .aspectRatio(1f)
-                                    .clip(RoundedCornerShape(20.dp))
-                                    .border(
-                                        width = if (color == colorEnum) 2.dp else 0.dp,
-                                        color = if (color == colorEnum)
-                                            MaterialTheme.colorScheme.primary
-                                        else Color.Transparent,
-                                        shape = RoundedCornerShape(20.dp)
-                                    )
-                                    .clickable {
-                                        onColorChange(colorEnum)
-                                        scope.launch { sheetState.hide() }.invokeOnCompletion {
-                                            if (!sheetState.isVisible) {
-                                                visible = false
-                                            }
-                                        }
-                                    }
-                            ) {
-                                Box(
-                                    modifier = Modifier
-                                        .size(20.dp)
-                                        .clip(CircleShape)
-                                        .background(colorValue.color)
-                                )
-                            }
-                        }
-                    }
-                }*/
             }
         }
     }
