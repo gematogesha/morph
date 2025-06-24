@@ -5,12 +5,12 @@ import androidx.compose.material3.SnackbarHostState
 import com.wheatley.morph.BuildConfig
 import com.wheatley.morph.R
 import com.wheatley.morph.util.release.GetApplicationRelease
+import com.wheatley.morph.util.release.ReleaseServiceImpl
+import com.wheatley.morph.util.system.SnackbarHelper
 import com.wheatley.morph.util.system.isPreviewBuildType
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
-import com.wheatley.morph.util.release.ReleaseServiceImpl
 
 class UpdateChecker(private val context: Context) {
 
@@ -19,7 +19,7 @@ class UpdateChecker(private val context: Context) {
         ReleaseServiceImpl(json = Json { ignoreUnknownKeys = true })
     )
 
-    suspend fun checkForUpdate(
+    private suspend fun checkForUpdate(
         forceCheck: Boolean = false
     ): GetApplicationRelease.Result {
         return withContext(Dispatchers.IO) {
@@ -54,23 +54,17 @@ class UpdateChecker(private val context: Context) {
                         }
                     }
                     is GetApplicationRelease.Result.NoNewUpdate -> {
-                        showSnackbar(snackbarHostState, context.getString(R.string.update_check_no_new_updates))
+                        SnackbarHelper.show(snackbarHostState, context.getString(R.string.update_check_no_new_updates))
                     }
                     is GetApplicationRelease.Result.OsTooOld -> {
-                        showSnackbar(snackbarHostState, context.getString(R.string.update_check_eol))
+                        SnackbarHelper.show(snackbarHostState, context.getString(R.string.update_check_eol))
                     }
                 }
             } catch (e: Exception) {
-                showSnackbar(snackbarHostState, e.message ?: "Ошибка проверки обновления")
+                SnackbarHelper.show(snackbarHostState, e.message ?: "Ошибка проверки обновления")
             } finally {
                 onFinish()
             }
-        }
-    }
-
-    private suspend fun showSnackbar(snackbarHostState: SnackbarHostState, message: String) {
-        withContext(Dispatchers.Main) {
-            snackbarHostState.showSnackbar(message)
         }
     }
 
