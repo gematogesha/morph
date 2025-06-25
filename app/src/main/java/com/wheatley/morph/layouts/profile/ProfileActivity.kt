@@ -35,6 +35,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import cafe.adriel.voyager.core.screen.Screen
 import coil.compose.rememberAsyncImagePainter
 import com.wheatley.morph.model.challenge.ChallengeEntry
 import com.wheatley.morph.model.UserPrefs
@@ -45,104 +46,90 @@ import com.wheatley.morph.ui.theme.MorphTheme
 import com.wheatley.morph.model.challenge.ChallengeViewModel
 
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
-class ProfileActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdge()
-        super.onCreate(savedInstanceState)
+class ProfileScreen: Screen {
 
-        setContent {
-            MorphTheme {
-                ProfileScreen()
-            }
-        }
-    }
-}
+    @Composable
+    override fun Content() {
+        val vm: ChallengeViewModel = viewModel()
+        val allEntries by vm.allEntries().collectAsState(initial = emptyList())
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
-@Composable
-fun ProfileScreen() {
+        val context = LocalContext.current
+        val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
-    ApplySystemUi()
-
-    val vm: ChallengeViewModel = viewModel()
-    val allEntries by vm.allEntries().collectAsState(initial = emptyList())
-
-    val context = LocalContext.current
-    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
-
-    val userName by UserPrefs.getUserNameFlow(context).collectAsState(initial = "")
-    val photoUri by UserPrefs.getUserPhotoFlow(context).collectAsState(initial = null)
+        val userName by UserPrefs.getUserNameFlow(context).collectAsState(initial = "")
+        val photoUri by UserPrefs.getUserPhotoFlow(context).collectAsState(initial = null)
 
 
-    Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text("Профиль")
-                },
-                scrollBehavior = scrollBehavior,
-            )
-        },
-        content = { innerPadding ->
-            Surface(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                LazyColumn(
-                    contentPadding = innerPadding,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 16.dp)
-                ){
-                    item {
-                        Text ("$userName")
-                    }
-                    item {
-                        Text("photoUri = ${photoUri ?: "null"}")
-                    }
+        Scaffold(
+            modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+            topBar = {
+                TopAppBar(
+                    title = {
+                        Text("Профиль")
+                    },
+                    scrollBehavior = scrollBehavior,
+                )
+            },
+            content = { innerPadding ->
+                Surface(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    LazyColumn(
+                        contentPadding = innerPadding,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = 16.dp)
+                    ){
+                        item {
+                            Text ("$userName")
+                        }
+                        item {
+                            Text("photoUri = ${photoUri ?: "null"}")
+                        }
 
-                    item {
-                        ChallengeStreakView(entries = allEntries)
-                    }
+                        item {
+                            ChallengeStreakView(entries = allEntries)
+                        }
 
-                    item {
-                        photoUri?.let {
-                            val rainbowColorsBrush = remember {
-                                Brush.sweepGradient(
-                                    listOf(
-                                        Color(0xFF9575CD),
-                                        Color(0xFFBA68C8),
-                                        Color(0xFFE57373),
-                                        Color(0xFFFFB74D),
-                                        Color(0xFFFFF176),
-                                        Color(0xFFAED581),
-                                        Color(0xFF4DD0E1),
-                                        Color(0xFF9575CD)
+                        item {
+                            photoUri?.let {
+                                val rainbowColorsBrush = remember {
+                                    Brush.sweepGradient(
+                                        listOf(
+                                            Color(0xFF9575CD),
+                                            Color(0xFFBA68C8),
+                                            Color(0xFFE57373),
+                                            Color(0xFFFFB74D),
+                                            Color(0xFFFFF176),
+                                            Color(0xFFAED581),
+                                            Color(0xFF4DD0E1),
+                                            Color(0xFF9575CD)
+                                        )
                                     )
+                                }
+                                Image(
+                                    painter = rememberAsyncImagePainter(it),
+                                    contentDescription = null,
+                                    contentScale = ContentScale.Crop,
+
+                                    modifier = Modifier
+                                        .size(220.dp)
+                                        .clip(MaterialShapes.Cookie12Sided.toShape())
+                                        .border(
+                                            BorderStroke(4.dp, rainbowColorsBrush),
+                                            MaterialShapes.Cookie12Sided.toShape()
+                                        )
                                 )
                             }
-                            Image(
-                                painter = rememberAsyncImagePainter(it),
-                                contentDescription = null,
-                                contentScale = ContentScale.Crop,
-
-                                modifier = Modifier
-                                    .size(220.dp)
-                                    .clip(MaterialShapes.Cookie12Sided.toShape())
-                                    .border(
-                                        BorderStroke(4.dp, rainbowColorsBrush),
-                                        MaterialShapes.Cookie12Sided.toShape()
-                                    )
-                            )
                         }
                     }
-                }
 
+                }
             }
-        }
-    )
+        )
+    }
+
 }
 
 @Composable
