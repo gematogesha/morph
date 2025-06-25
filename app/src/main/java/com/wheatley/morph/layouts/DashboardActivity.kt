@@ -33,6 +33,8 @@ import com.wheatley.morph.util.ui.ThemeManager
 import com.wheatley.morph.util.update.UpdateChecker
 import kotlinx.coroutines.launch
 
+//TODO: Реализовать ViewModel ВО ВСЕХ Screen с .launch
+
 class DashboardActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         ThemeManager.loadTheme(this)
