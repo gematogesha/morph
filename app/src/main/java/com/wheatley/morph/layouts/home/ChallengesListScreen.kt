@@ -32,11 +32,9 @@ import androidx.media3.common.util.UnstableApi
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.wheatley.morph.model.challenge.ChallengeStatus
-import com.wheatley.morph.ui.theme.ApplySystemUi
+import com.wheatley.morph.model.challenge.ChallengeViewModel
 import com.wheatley.morph.util.app.color
 import com.wheatley.morph.util.app.isSameDay
-import com.wheatley.morph.model.challenge.ChallengeViewModel
 import java.util.Date
 
 @androidx.annotation.OptIn(UnstableApi::class)

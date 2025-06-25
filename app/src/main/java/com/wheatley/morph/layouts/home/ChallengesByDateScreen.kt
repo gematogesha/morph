@@ -1,7 +1,6 @@
 package com.wheatley.morph.layouts.home
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -49,7 +48,7 @@ import androidx.media3.common.util.UnstableApi
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.wheatley.morph.ui.theme.ApplySystemUi
+import com.wheatley.morph.model.challenge.ChallengeViewModel
 import com.wheatley.morph.ui.theme.LocalExColorScheme
 import com.wheatley.morph.util.app.color
 import com.wheatley.morph.util.app.isSameDay
@@ -57,7 +56,6 @@ import com.wheatley.morph.util.date.DateFormatStyle
 import com.wheatley.morph.util.date.DateFormatter
 import com.wheatley.morph.util.setting.SettingsKeys
 import com.wheatley.morph.util.setting.SettingsManager
-import com.wheatley.morph.model.challenge.ChallengeViewModel
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.TextStyle
