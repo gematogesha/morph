@@ -46,6 +46,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.media3.common.util.UnstableApi
+import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import com.wheatley.morph.ui.theme.ApplySystemUi
 import com.wheatley.morph.ui.theme.LocalExColorScheme
 import com.wheatley.morph.util.app.color
@@ -63,134 +66,128 @@ import java.util.Date
 @androidx.annotation.OptIn(UnstableApi::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
-@Composable
-fun ChallengesByDateScreen(
-    onBack: () -> Unit,
-    date: LocalDate
-) {
 
-    ApplySystemUi()
+data class ChallengesByDateScreen(
+    val date: LocalDate
+): Screen {
 
-    val vm: ChallengeViewModel = viewModel()
-    val context = LocalContext.current
-    val activity = context as? Activity
+    @Composable
+    override fun Content() {
 
-    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+        val navigator = LocalNavigator.currentOrThrow
+        val vm: ChallengeViewModel = viewModel()
+        val context = LocalContext.current
+        val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
-    val allEntries by vm.allEntries().collectAsStateWithLifecycle(initialValue = emptyList())
+        val allEntries by vm.allEntries().collectAsStateWithLifecycle(initialValue = emptyList())
+        val inProgress by vm.inProgressChallenges.collectAsState(initial = emptyList())
+        val challenges = inProgress
 
-    val status = activity?.intent?.getStringExtra("key_status")
+        val relativeDate =
+            SettingsManager.getBoolean(context, SettingsKeys.RELATIVE_TIMESTAMPS, true)
 
-    val label = if (status == "inProgress") "В процессе" else "Завершенные"
-
-    val inProgress by vm.inProgressChallenges.collectAsState(initial = emptyList())
-    val completed by vm.completedChallenges.collectAsState(initial = emptyList())
-
-    val challenges = if (status == "inProgress") inProgress else completed
-
-    val relativeDate = SettingsManager.getBoolean(context, SettingsKeys.RELATIVE_TIMESTAMPS, true)
-
-    fun formatRelativeDate(date: LocalDate, reference: LocalDate = LocalDate.now()): String {
-        return if (relativeDate) {
-            when (date) {
-                reference -> "Сегодня"
-                reference.minusDays(1) -> "Вчера"
-                reference.minusDays(2) -> "Позавчера"
-                reference.plusDays(1) -> "Завтра"
-                reference.plusDays(2) -> "Послезавтра"
-                else -> DateFormatter.format(date, DateFormatStyle.DAY_MONTH)
+        fun formatRelativeDate(date: LocalDate, reference: LocalDate = LocalDate.now()): String {
+            return if (relativeDate) {
+                when (date) {
+                    reference -> "Сегодня"
+                    reference.minusDays(1) -> "Вчера"
+                    reference.minusDays(2) -> "Позавчера"
+                    reference.plusDays(1) -> "Завтра"
+                    reference.plusDays(2) -> "Послезавтра"
+                    else -> DateFormatter.format(date, DateFormatStyle.DAY_MONTH)
+                }
+            } else {
+                DateFormatter.format(date, DateFormatStyle.DAY_MONTH)
             }
-        } else {
-            DateFormatter.format(date, DateFormatStyle.DAY_MONTH)
         }
-    }
 
-    Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(formatRelativeDate(date))
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
-                        )
-                    }
-                },
-                scrollBehavior = scrollBehavior,
-            )
-        },
-        content = { innerPadding ->
-            Surface(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                LazyColumn(
-                    contentPadding = innerPadding,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 16.dp)
+        Scaffold(
+            modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+            topBar = {
+                TopAppBar(
+                    title = {
+                        Text(formatRelativeDate(date))
+                    },
+                    navigationIcon = {
+                        IconButton(onClick = { navigator.pop() }) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = "Back"
+                            )
+                        }
+                    },
+                    scrollBehavior = scrollBehavior,
+                )
+            },
+            content = { innerPadding ->
+                Surface(
+                    modifier = Modifier.fillMaxSize()
                 ) {
+                    LazyColumn(
+                        contentPadding = innerPadding,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = 16.dp)
+                    ) {
 
-                    item {
-                        WeekRow(today = date)
-                    }
+                        item {
+                            WeekRow(today = date)
+                        }
 
-                    item {
-                        val options = listOf("Work", "Restaurant", "Coffee")
-                        val selectedIndex = remember { mutableIntStateOf(0) }
+                        item {
+                            val options = listOf("Work", "Restaurant", "Coffee")
+                            val selectedIndex = remember { mutableIntStateOf(0) }
 
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween)
-                        ) {
-                            options.forEachIndexed { index, label ->
-                                ToggleButton(
-                                    checked = selectedIndex.intValue == index,
-                                    onCheckedChange = {
-                                        selectedIndex.intValue = index
-                                    },
-                                    modifier = Modifier.weight(1f),
-                                    shapes = when (index) {
-                                        0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
-                                        options.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
-                                        else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween)
+                            ) {
+                                options.forEachIndexed { index, label ->
+                                    ToggleButton(
+                                        checked = selectedIndex.intValue == index,
+                                        onCheckedChange = {
+                                            selectedIndex.intValue = index
+                                        },
+                                        modifier = Modifier.weight(1f),
+                                        shapes = when (index) {
+                                            0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
+                                            options.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
+                                            else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
+                                        }
+                                    ) {
+                                        Text(label)
                                     }
-                                ) {
-                                    Text(label)
                                 }
                             }
                         }
-                    }
 
-                    items(challenges) { challenge ->
-                        val entries = allEntries.filter { it.challengeId == challenge.id }
-                        val todayDone = entries
-                            .filter { it.date.isSameDay(Date()) }
-                            .maxByOrNull { it.date }
-                            ?.done == true
+                        items(challenges) { challenge ->
+                            val entries = allEntries.filter { it.challengeId == challenge.id }
+                            val todayDone = entries
+                                .filter { it.date.isSameDay(Date()) }
+                                .maxByOrNull { it.date }
+                                ?.done == true
 
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 8.dp)
-                        ) {
-                            Text(challenge.name, Modifier.weight(1f))
-                            Text("sss", Modifier.weight(1f), color = challenge.color.color())
-                            Checkbox(
-                                checked = todayDone,
-                                onCheckedChange = { checked ->
-                                    vm.toggleDone(challenge.id, Date(), checked)
-                                }
-                            )
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 8.dp)
+                            ) {
+                                Text(challenge.name, Modifier.weight(1f))
+                                Text("sss", Modifier.weight(1f), color = challenge.color.color())
+                                Checkbox(
+                                    checked = todayDone,
+                                    onCheckedChange = { checked ->
+                                        vm.toggleDone(challenge.id, Date(), checked)
+                                    }
+                                )
+                            }
                         }
                     }
                 }
             }
-        }
-    )
+        )
+    }
 }
 
 @Composable
@@ -228,7 +225,10 @@ fun WeekRow(
                         .background(
                             if (isToday) {
                                 Brush.verticalGradient(
-                                    colors = listOf(LocalExColorScheme.current.primary.secondColor, LocalExColorScheme.current.primary.color),
+                                    colors = listOf(
+                                        LocalExColorScheme.current.primary.secondColor,
+                                        LocalExColorScheme.current.primary.color
+                                    ),
                                 )
                             } else {
                                 SolidColor(Color.Transparent)

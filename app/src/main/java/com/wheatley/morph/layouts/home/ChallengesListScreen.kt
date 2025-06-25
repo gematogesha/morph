@@ -29,6 +29,10 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.media3.common.util.UnstableApi
+import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
+import com.wheatley.morph.model.challenge.ChallengeStatus
 import com.wheatley.morph.ui.theme.ApplySystemUi
 import com.wheatley.morph.util.app.color
 import com.wheatley.morph.util.app.isSameDay
@@ -38,85 +42,88 @@ import java.util.Date
 @androidx.annotation.OptIn(UnstableApi::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
-@Composable
-fun ChallengesListScreen(
-     filter: String,
-     onBack: () -> Unit
-) {
 
-    ApplySystemUi()
+data class ChallengesListScreen(
+    val status: String
+): Screen {
 
-    val vm: ChallengeViewModel = viewModel()
+    @Composable
+    override fun Content() {
 
-    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+        val navigator = LocalNavigator.currentOrThrow
 
-    val allEntries by vm.allEntries().collectAsStateWithLifecycle(initialValue = emptyList())
+        val vm: ChallengeViewModel = viewModel()
 
-    val label = if (filter == "inProgress") "В процессе" else "Завершенные"
+        val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
-    val inProgress by vm.inProgressChallenges.collectAsState(initial = emptyList())
-    val completed by vm.completedChallenges.collectAsState(initial = emptyList())
+        val allEntries by vm.allEntries().collectAsStateWithLifecycle(initialValue = emptyList())
 
-    val challenges = if (filter == "inProgress") inProgress else completed
+        val label = if (status == "inProgress") "В процессе" else "Завершенные"
 
-    Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(label)
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
-                        )
-                    }
-                },
-                scrollBehavior = scrollBehavior,
-            )
-        },
-        content = { innerPadding ->
-            Surface(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                LazyColumn(
-                    contentPadding = innerPadding,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 16.dp)
-                ) {
+        val inProgress by vm.inProgressChallenges.collectAsState(initial = emptyList())
+        val completed by vm.completedChallenges.collectAsState(initial = emptyList())
 
-                    item {
+        val challenges = if (status == "inProgress") inProgress else completed
 
-                    }
-
-                    items(challenges) { challenge ->
-                        val entries = allEntries.filter { it.challengeId == challenge.id }
-                        val todayDone = entries
-                            .filter { it.date.isSameDay(Date()) }
-                            .maxByOrNull { it.date }
-                            ?.done == true
-
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 8.dp)
-                        ) {
-                            Text(challenge.name, Modifier.weight(1f))
-                            Text("sss", Modifier.weight(1f), color = challenge.color.color())
-                            Checkbox(
-                                checked = todayDone,
-                                onCheckedChange = { checked ->
-                                    vm.toggleDone(challenge.id, Date(), checked)
-                                }
+        Scaffold(
+            modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+            topBar = {
+                TopAppBar(
+                    title = {
+                        Text(label)
+                    },
+                    navigationIcon = {
+                        IconButton(onClick = { navigator.pop() }) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = "Back"
                             )
+                        }
+                    },
+                    scrollBehavior = scrollBehavior,
+                )
+            },
+            content = { innerPadding ->
+                Surface(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    LazyColumn(
+                        contentPadding = innerPadding,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = 16.dp)
+                    ) {
+
+                        item {
+
+                        }
+
+                        items(challenges) { challenge ->
+                            val entries = allEntries.filter { it.challengeId == challenge.id }
+                            val todayDone = entries
+                                .filter { it.date.isSameDay(Date()) }
+                                .maxByOrNull { it.date }
+                                ?.done == true
+
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 8.dp)
+                            ) {
+                                Text(challenge.name, Modifier.weight(1f))
+                                Text("sss", Modifier.weight(1f), color = challenge.color.color())
+                                Checkbox(
+                                    checked = todayDone,
+                                    onCheckedChange = { checked ->
+                                        vm.toggleDone(challenge.id, Date(), checked)
+                                    }
+                                )
+                            }
                         }
                     }
                 }
             }
-        }
-    )
+        )
+    }
 }
