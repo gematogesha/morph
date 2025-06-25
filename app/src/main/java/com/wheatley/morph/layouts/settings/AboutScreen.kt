@@ -1,10 +1,6 @@
 package com.wheatley.morph.layouts.settings
 
 import android.annotation.SuppressLint
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -27,11 +23,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -46,30 +40,21 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.wheatley.morph.R
 import com.wheatley.morph.components.SettingsItem
 import com.wheatley.morph.components.UpdateScreen
-import com.wheatley.morph.ui.theme.ApplySystemUi
-import com.wheatley.morph.ui.theme.MorphTheme
+import com.wheatley.morph.layouts.settings.model.AboutScreenModel
 import com.wheatley.morph.util.app.AppInfo.getVersionName
-import com.wheatley.morph.util.update.UpdateChecker
-import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "RestrictedApi")
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
-class AboutScreen: Screen {
+class AboutScreen : Screen{
 
     @Composable
     override fun Content() {
         val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
-
-        val context = LocalContext.current
-        val scope = rememberCoroutineScope()
         val navigator = LocalNavigator.currentOrThrow
+        val context = LocalContext.current
 
-        var isLoading by remember { mutableStateOf(false) }
-        var showSheet by remember { mutableStateOf(false) }
-
-        var updateVersion by remember { mutableStateOf("") }
-        var updateChangelog by remember { mutableStateOf("") }
-        var updateDownload by remember { mutableStateOf("") }
+        val model = remember { AboutScreenModel(context) }
+        val state by model.state.collectAsState()
 
         val snackbarHostState = remember { SnackbarHostState() }
 
@@ -77,15 +62,10 @@ class AboutScreen: Screen {
             modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = {
                 TopAppBar(
-                    title = {
-                        Text(text = "Информация", maxLines = 1, overflow = TextOverflow.Ellipsis)
-                    },
+                    title = { Text("Информация", maxLines = 1, overflow = TextOverflow.Ellipsis) },
                     navigationIcon = {
                         IconButton(onClick = { navigator.pop() }) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = "Back"
-                            )
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                         }
                     },
                     scrollBehavior = scrollBehavior
@@ -95,25 +75,20 @@ class AboutScreen: Screen {
                 SnackbarHost(hostState = snackbarHostState) { data ->
                     Snackbar(snackbarData = data)
                 }
-            },
+            }
         ) { innerPadding ->
-            Surface(
-                modifier = Modifier.fillMaxSize()
-            ) {
+            Surface(modifier = Modifier.fillMaxSize()) {
                 LazyColumn(
                     contentPadding = innerPadding,
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-
                     item {
                         Box(
-                            modifier = Modifier
-                                .fillMaxSize(),
+                            modifier = Modifier.fillMaxSize(),
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
-                                modifier = Modifier
-                                    .size(200.dp),
+                                modifier = Modifier.size(200.dp),
                                 painter = painterResource(id = R.drawable.ic_launcher_foreground),
                                 tint = Color.Unspecified,
                                 contentDescription = "Logo"
@@ -121,48 +96,36 @@ class AboutScreen: Screen {
                         }
                         HorizontalDivider()
                     }
+
                     item {
                         SettingsItem(
                             title = "Версия",
-                            subTitle = getVersionName(true),
+                            subTitle = getVersionName(true)
                         )
                     }
+
                     item {
                         SettingsItem(
                             title = "Проверить обновление",
                             action = {
-                                scope.launch {
-                                    isLoading = true
-
-                                    UpdateChecker(context).checkVersion(
-                                        snackbarHostState = snackbarHostState,
-                                        onNewUpdate = { version, changelog, download ->
-                                            updateVersion = version
-                                            updateChangelog = changelog
-                                            updateDownload = download
-                                            showSheet = true
-                                        },
-                                        onFinish = {
-                                            isLoading = false
-                                        },
-                                    )
-                                }
+                                model.checkForUpdate(snackbarHostState)
                             },
                             trailingContent = {
-                                if (isLoading) {
+                                if (state.isLoading) {
                                     CircularProgressIndicator()
                                 }
                             }
                         )
                     }
                 }
-                if (showSheet) {
+
+                if (state.showSheet) {
                     UpdateScreen(
-                        versionName = updateVersion,
-                        changelogInfo = updateChangelog,
-                        downloadLink = updateDownload,
-                        showSheet = showSheet,
-                        onDismiss = { showSheet = false }
+                        versionName = state.version,
+                        changelogInfo = state.changelog,
+                        downloadLink = state.downloadLink,
+                        showSheet = state.showSheet,
+                        onDismiss = { model.dismissSheet() }
                     )
                 }
             }
