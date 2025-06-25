@@ -32,7 +32,7 @@ import androidx.media3.common.util.UnstableApi
 import com.wheatley.morph.ui.theme.ApplySystemUi
 import com.wheatley.morph.util.app.color
 import com.wheatley.morph.util.app.isSameDay
-import com.wheatley.morph.viewmodel.ChallengeViewModel
+import com.wheatley.morph.model.challenge.ChallengeViewModel
 import java.util.Date
 
 @androidx.annotation.OptIn(UnstableApi::class)

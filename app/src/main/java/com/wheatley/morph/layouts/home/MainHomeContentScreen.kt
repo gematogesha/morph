@@ -62,17 +62,15 @@ import com.wheatley.morph.components.CardAction
 import com.wheatley.morph.components.CardBig
 import com.wheatley.morph.layouts.profile.ProfileActivity
 import com.wheatley.morph.model.UserPrefs
-import com.wheatley.morph.model.calculateCurrentStreak
+import com.wheatley.morph.model.challenge.calculateCurrentStreak
 import com.wheatley.morph.ui.theme.LocalExColorScheme
 import com.wheatley.morph.util.app.pluralDays
-import com.wheatley.morph.viewmodel.ChallengeViewModel
+import com.wheatley.morph.model.challenge.ChallengeViewModel
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.SolidColor
-import com.wheatley.morph.util.date.DateFormatStyle
-import com.wheatley.morph.util.date.DateFormatter
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
@@ -241,7 +239,7 @@ fun CalendarGrid(
     val weekdays = remember {
         DayOfWeek.entries
             .sortedBy { it.value % 7 }
-            .map { it.getDisplayName(TextStyle.SHORT, Locale("ru")) }
+            .map { it.getDisplayName(TextStyle.SHORT, Locale.forLanguageTag("ru")) }
     }
 
     CardBig(
@@ -265,7 +263,7 @@ fun CalendarGrid(
                 }
 
                 Text(
-                    text = currentMonth.month.getDisplayName(TextStyle.FULL_STANDALONE, Locale("ru"))
+                    text = currentMonth.month.getDisplayName(TextStyle.FULL_STANDALONE, Locale.forLanguageTag("ru"))
                         .replaceFirstChar { it.titlecase() } + " ${currentMonth.year}",
                     style = MaterialTheme.typography.titleLarge
                 )

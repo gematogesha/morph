@@ -33,7 +33,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -55,13 +54,11 @@ import com.wheatley.morph.util.date.DateFormatStyle
 import com.wheatley.morph.util.date.DateFormatter
 import com.wheatley.morph.util.setting.SettingsKeys
 import com.wheatley.morph.util.setting.SettingsManager
-import com.wheatley.morph.viewmodel.ChallengeViewModel
+import com.wheatley.morph.model.challenge.ChallengeViewModel
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.TextStyle
 import java.util.Date
-import java.time.format.DateTimeFormatter
-import java.util.*
 
 @androidx.annotation.OptIn(UnstableApi::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -213,7 +210,7 @@ fun WeekRow(
     ) {
         days.forEach { date ->
             val isToday = date == today
-            val dayName = date.dayOfWeek.getDisplayName(TextStyle.SHORT, java.util.Locale("ru"))
+            val dayName = date.dayOfWeek.getDisplayName(TextStyle.SHORT, java.util.Locale.forLanguageTag("ru"))
             val dayNumber = date.dayOfMonth
 
             Column(

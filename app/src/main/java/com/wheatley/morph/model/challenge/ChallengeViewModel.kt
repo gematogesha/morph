@@ -1,16 +1,9 @@
-package com.wheatley.morph.viewmodel
+package com.wheatley.morph.model.challenge
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.room.Room
-import com.wheatley.morph.dao.AppDatabase
-import com.wheatley.morph.dao.ChallengeDao
-import com.wheatley.morph.model.Challenge
-import com.wheatley.morph.model.ChallengeColor
-import com.wheatley.morph.model.ChallengeEntry
-import com.wheatley.morph.model.ChallengeStatus
-import com.wheatley.morph.model.truncateToDay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
@@ -21,7 +14,9 @@ class ChallengeRepository(val dao: ChallengeDao) {
 
     fun entries(challengeId: Long) = dao.getEntriesForChallenge(challengeId)
 
-    suspend fun addChallenge(name: String, emoji: String, duration: Int = 1, color: ChallengeColor) = dao.insertChallenge(Challenge(name = name, emoji = emoji, duration = duration, color = color))
+    suspend fun addChallenge(name: String, emoji: String, duration: Int = 1, color: ChallengeColor) = dao.insertChallenge(
+        Challenge(name = name, emoji = emoji, duration = duration, color = color)
+    )
 
     suspend fun updateChallenge(challenge: Challenge) = dao.updateChallenge(challenge)
 

@@ -16,7 +16,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialShapes
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -37,14 +36,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
-import com.wheatley.morph.layouts.challenge.ChallengeDetailsScreen
-import com.wheatley.morph.model.ChallengeEntry
+import com.wheatley.morph.model.challenge.ChallengeEntry
 import com.wheatley.morph.model.UserPrefs
-import com.wheatley.morph.model.calculateCurrentStreak
-import com.wheatley.morph.model.calculateMaxStreak
+import com.wheatley.morph.model.challenge.calculateCurrentStreak
+import com.wheatley.morph.model.challenge.calculateMaxStreak
 import com.wheatley.morph.ui.theme.ApplySystemUi
 import com.wheatley.morph.ui.theme.MorphTheme
-import com.wheatley.morph.viewmodel.ChallengeViewModel
+import com.wheatley.morph.model.challenge.ChallengeViewModel
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")

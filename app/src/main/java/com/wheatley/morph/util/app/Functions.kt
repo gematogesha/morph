@@ -2,7 +2,7 @@ package com.wheatley.morph.util.app
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import com.wheatley.morph.model.ChallengeColor
+import com.wheatley.morph.model.challenge.ChallengeColor
 import com.wheatley.morph.ui.theme.ColorFamily
 import com.wheatley.morph.ui.theme.LocalExColorScheme
 import java.time.ZoneId

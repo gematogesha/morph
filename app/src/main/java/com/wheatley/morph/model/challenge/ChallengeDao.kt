@@ -1,13 +1,6 @@
-package com.wheatley.morph.dao
+package com.wheatley.morph.model.challenge
 
 import androidx.room.*
-import com.wheatley.morph.model.Challenge
-import com.wheatley.morph.model.ChallengeColorConverter
-import com.wheatley.morph.model.ChallengeEntry
-import com.wheatley.morph.model.ChallengeScheduleConverter
-import com.wheatley.morph.model.ChallengeStatus
-import com.wheatley.morph.model.ChallengeStatusConverter
-import com.wheatley.morph.model.TimeConverter
 import kotlinx.coroutines.flow.Flow
 import java.util.Date
 

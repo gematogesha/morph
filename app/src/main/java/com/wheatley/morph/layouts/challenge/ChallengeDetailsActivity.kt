@@ -43,10 +43,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.wheatley.morph.model.ChallengeEntry
+import com.wheatley.morph.model.challenge.ChallengeEntry
 import com.wheatley.morph.ui.theme.ApplySystemUi
 import com.wheatley.morph.ui.theme.MorphTheme
-import com.wheatley.morph.viewmodel.ChallengeViewModel
+import com.wheatley.morph.model.challenge.ChallengeViewModel
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date

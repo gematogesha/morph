@@ -12,7 +12,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -68,11 +67,11 @@ import androidx.media3.common.util.Log
 import androidx.media3.common.util.UnstableApi
 import com.wheatley.morph.R
 import com.wheatley.morph.components.CustomTextField
-import com.wheatley.morph.model.ChallengeColor
+import com.wheatley.morph.model.challenge.ChallengeColor
 import com.wheatley.morph.ui.theme.ColorFamily
 import com.wheatley.morph.ui.theme.LocalExColorScheme
 import com.wheatley.morph.util.app.pluralDays
-import com.wheatley.morph.viewmodel.ChallengeViewModel
+import com.wheatley.morph.model.challenge.ChallengeViewModel
 import com.wheatley.morph.util.system.SnackbarHelper
 import kotlinx.coroutines.launch
 

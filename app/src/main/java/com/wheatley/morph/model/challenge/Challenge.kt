@@ -1,4 +1,4 @@
-package com.wheatley.morph.model
+package com.wheatley.morph.model.challenge
 
 import android.annotation.SuppressLint
 import androidx.room.Entity
