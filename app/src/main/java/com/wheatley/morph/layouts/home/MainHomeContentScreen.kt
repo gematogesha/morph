@@ -77,6 +77,8 @@ import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.TextStyle
+import java.time.temporal.ChronoUnit
+import java.time.temporal.TemporalAdjusters
 import java.util.*
 
 @androidx.annotation.OptIn(UnstableApi::class)
@@ -229,9 +231,11 @@ fun CalendarGrid(
 
     val days = remember(currentMonth) {
         val firstDayOfMonth = currentMonth.atDay(1)
-        val firstDayOfWeek = (firstDayOfMonth.dayOfWeek.value + 6) % 7
-        val daysBefore = firstDayOfMonth.minusDays(firstDayOfWeek.toLong())
-        List(42) { daysBefore.plusDays(it.toLong()) }
+        val lastDayOfMonth = currentMonth.atEndOfMonth()
+        val firstVisibleDay = firstDayOfMonth.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
+        val lastVisibleDay = lastDayOfMonth.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY))
+        val totalDays = ChronoUnit.DAYS.between(firstVisibleDay, lastVisibleDay).toInt() + 1
+        List(totalDays) { firstVisibleDay.plusDays(it.toLong()) }
     }
 
     val weekdays = remember {
@@ -297,7 +301,7 @@ fun CalendarGrid(
                 columns = GridCells.Fixed(7),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(min = 240.dp, max = 300.dp),
+                    .heightIn(min = 200.dp, max = 300.dp),
                 userScrollEnabled = false
             ) {
                 items(days.size) { index ->
