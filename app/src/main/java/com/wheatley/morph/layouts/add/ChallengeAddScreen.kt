@@ -137,9 +137,7 @@ class ChallengeAddScreen: Screen {
                             onClick = {
                                 if (challengeName.isBlank()) {
                                     scope.launch {
-                                        snackbarHostState.showSnackbar("message")
-                                        //SnackbarHelper .show(snackbarHostState, "Не все поля заполнены")
-                                        Log.d("ChallengeAddScreen", "Не все поля заполнены")
+                                        SnackbarHelper .show(snackbarHostState, "Не все поля заполнены")
                                     }
                                     return@IconButton
                                 }
