@@ -29,14 +29,19 @@ fun SettingsLabel (title: String) {
 fun SettingsItem(
     title: String,
     subTitle: String? = null,
-    action: () -> Unit,
+    action: (() -> Unit)? = null,
     icon: (@Composable () -> Unit)? = null,
     trailingContent: (@Composable () -> Unit)? = null
 ) {
     Row(
         modifier = Modifier
+            .height(72.dp)
             .fillMaxWidth()
-            .clickable { action() },
+            .clickable {
+                if (action != null) {
+                    action()
+                }
+            },
         verticalAlignment = Alignment.CenterVertically
     ) {
         ListItem(
