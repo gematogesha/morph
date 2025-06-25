@@ -1,10 +1,5 @@
 package com.wheatley.morph.layouts.profile
 
-import android.annotation.SuppressLint
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
@@ -37,13 +32,11 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import cafe.adriel.voyager.core.screen.Screen
 import coil.compose.rememberAsyncImagePainter
-import com.wheatley.morph.model.challenge.ChallengeEntry
 import com.wheatley.morph.model.UserPrefs
+import com.wheatley.morph.model.challenge.ChallengeEntry
+import com.wheatley.morph.model.challenge.ChallengeViewModel
 import com.wheatley.morph.model.challenge.calculateCurrentStreak
 import com.wheatley.morph.model.challenge.calculateMaxStreak
-import com.wheatley.morph.ui.theme.ApplySystemUi
-import com.wheatley.morph.ui.theme.MorphTheme
-import com.wheatley.morph.model.challenge.ChallengeViewModel
 
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
