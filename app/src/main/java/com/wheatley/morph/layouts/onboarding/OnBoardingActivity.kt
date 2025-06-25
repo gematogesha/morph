@@ -62,6 +62,8 @@ import com.wheatley.morph.components.CustomTextField
 import com.wheatley.morph.layouts.DashboardActivity
 import com.wheatley.morph.ui.theme.ApplySystemUiRegister
 
+//TODO: Перейти на Voyadger
+
 class RegistrationActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
