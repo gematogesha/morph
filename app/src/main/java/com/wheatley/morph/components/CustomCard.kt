@@ -3,6 +3,7 @@ package com.wheatley.morph.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,6 +15,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,6 +28,10 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.wheatley.morph.model.challenge.Challenge
+import com.wheatley.morph.util.app.color
+import com.wheatley.morph.util.app.colorContainer
+import com.wheatley.morph.util.app.secondColor
 
 @Composable
 fun CardSmall(
@@ -113,19 +119,6 @@ fun CardAction(
 }
 
 @Composable
-fun ChallengeCard(
-    text: String,
-    subText: String,
-    icon: String,
-) {
-    CardBig(
-        
-    ) {
-
-    }
-}
-
-@Composable
 fun CardBig(
     modifier: Modifier = Modifier,
     color: Color = MaterialTheme.colorScheme.surfaceContainer,
@@ -149,6 +142,44 @@ fun CardBig(
             ) {
                 content()
             }
+        }
+    }
+}
+
+
+@Composable
+fun ChallengeCard(
+    challenge: Challenge,
+
+) {
+    CardBig(
+        color = challenge.color.colorContainer()
+    ) {
+        Column (
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            CardBadge(
+                colorTop = challenge.color.secondColor(),
+                colorBottom = challenge.color.color(),
+                icon = challenge.emoji
+            )
+            Column {
+                Text(
+                    text = challenge.name,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = "Описание",
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.outline
+                )
+            }
+            LinearProgressIndicator(
+                //progress = { challenge.duration.toFloat() },
+                color = challenge.color.color(),
+                trackColor = MaterialTheme.colorScheme.outlineVariant,
+            )
         }
     }
 }

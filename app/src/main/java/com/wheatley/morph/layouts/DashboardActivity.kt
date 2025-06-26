@@ -7,6 +7,17 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.filled.Assessment
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.outlined.AddCircleOutline
+import androidx.compose.material.icons.outlined.Assessment
+import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -104,12 +115,33 @@ class DashboardActivity : ComponentActivity() {
 @Composable
 private fun RowScope.TabNavigationItem(tab: Tab) {
     val tabNavigator = LocalTabNavigator.current
+    val selected = tabNavigator.current == tab
     NavigationBarItem(
-        selected = tabNavigator.current == tab,
+        selected = selected,
         onClick = { tabNavigator.current = tab },
         icon = {
-            tab.options.icon?.let { painter ->
-                Icon(painter = painter, contentDescription = tab.options.title)
+            when (tab) {
+                is HomeTab -> Icon(
+                    imageVector = if (selected) Icons.Filled.Home else Icons.Outlined.Home,
+                    contentDescription = "Главная"
+                )
+                is StatisticsTab -> Icon(
+                    imageVector = if (selected) Icons.Filled.Assessment else Icons.Outlined.Assessment,
+                    contentDescription = "Статистика"
+                )
+                is ChallengeAddTab -> Icon(
+                    imageVector = if (selected) Icons.Filled.AddCircle else Icons.Outlined.AddCircleOutline,
+                    contentDescription = "Добавить"
+                )
+                is ProfileTab -> Icon(
+                    imageVector = if (selected) Icons.Filled.Person else Icons.Outlined.Person,
+                    contentDescription = "Профиль"
+                )
+                is SettingsTab -> Icon(
+                    imageVector = if (selected) Icons.Filled.Settings else Icons.Outlined.Settings,
+                    contentDescription = "Настройки"
+                )
+                else -> Icon(Icons.Outlined.Home, contentDescription = null)
             }
         },
         label = { Text(tab.options.title) }

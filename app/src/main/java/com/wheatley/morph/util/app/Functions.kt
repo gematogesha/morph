@@ -68,3 +68,6 @@ fun ChallengeColor.colorContainer() = toExchangeColor().colorContainer
 
 @Composable
 fun ChallengeColor.onColorContainer() = toExchangeColor().onColorContainer
+
+@Composable
+fun ChallengeColor.secondColor() = toExchangeColor().secondColor

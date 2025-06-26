@@ -32,6 +32,7 @@ import androidx.media3.common.util.UnstableApi
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.wheatley.morph.components.ChallengeCard
 import com.wheatley.morph.model.challenge.ChallengeViewModel
 import com.wheatley.morph.util.app.color
 import com.wheatley.morph.util.app.isSameDay
@@ -97,6 +98,9 @@ data class ChallengesListScreen(
                         }
 
                         items(challenges) { challenge ->
+
+                            ChallengeCard(challenge)
+
                             val entries = allEntries.filter { it.challengeId == challenge.id }
                             val todayDone = entries
                                 .filter { it.date.isSameDay(Date()) }
@@ -125,3 +129,4 @@ data class ChallengesListScreen(
         )
     }
 }
+

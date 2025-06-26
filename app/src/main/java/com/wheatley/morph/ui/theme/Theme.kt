@@ -120,55 +120,55 @@ val extendedLight = ExtendedColorScheme(
     primary = ColorFamily(
         color = primary,
         secondColor = lighten(primary, 0.35f),
-        colorContainer = lighten(primary, 0.8f),
+        colorContainer = lighten(primary, 0.85f),
         onColorContainer = darken(primary, 0.05f)
     ),
     green = ColorFamily(
         color = green,
         secondColor = lighten(green, 0.35f),
-        colorContainer = lighten(green, 0.8f),
+        colorContainer = lighten(green, 0.85f),
         onColorContainer = darken(green, 0.05f)
     ),
     orange = ColorFamily(
         color = orange,
         secondColor = lighten(orange, 0.35f),
-        colorContainer = lighten(orange, 0.8f),
+        colorContainer = lighten(orange, 0.85f),
         onColorContainer = darken(orange, 0.05f)
     ),
     mint = ColorFamily(
         color = mint,
         secondColor = lighten(mint, 0.35f),
-        colorContainer = lighten(mint, 0.8f),
+        colorContainer = lighten(mint, 0.85f),
         onColorContainer = darken(mint, 0.05f)
     ),
     lightPurple = ColorFamily(
         color = lightPurple,
         secondColor = lighten(lightPurple, 0.35f),
-        colorContainer = lighten(lightPurple, 0.8f),
+        colorContainer = lighten(lightPurple, 0.855f),
         onColorContainer = darken(lightPurple, 0.05f)
     ),
     yellow = ColorFamily(
         color = yellow,
         secondColor = lighten(yellow, 0.35f),
-        colorContainer = lighten(yellow, 0.8f),
+        colorContainer = lighten(yellow, 0.85f),
         onColorContainer = darken(yellow, 0.05f)
     ),
     pink = ColorFamily(
         color = pink,
         secondColor = lighten(pink, 0.35f),
-        colorContainer = lighten(pink, 0.8f),
+        colorContainer = lighten(pink, 0.85f),
         onColorContainer = darken(pink, 0.05f)
     ),
     bluePurple = ColorFamily(
         color = bluePurple,
         secondColor = lighten(bluePurple, 0.35f),
-        colorContainer = lighten(bluePurple, 0.8f),
+        colorContainer = lighten(bluePurple, 0.85f),
         onColorContainer = darken(bluePurple, 0.05f)
     ),
     lightGreen = ColorFamily(
         color = lightGreen,
         secondColor = lighten(lightGreen, 0.35f),
-        colorContainer = lighten(lightGreen, 0.8f),
+        colorContainer = lighten(lightGreen, 0.85f),
         onColorContainer = darken(lightGreen, 0.05f)
     )
 )

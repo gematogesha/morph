@@ -79,7 +79,7 @@ object ChallengeAddTab : Tab {
 
             return remember {
                 TabOptions(
-                    index = 1u,
+                    index = 2u,
                     title = title,
                     icon = icon
                 )
@@ -104,7 +104,7 @@ object ProfileTab : Tab {
 
             return remember {
                 TabOptions(
-                    index = 1u,
+                    index = 3u,
                     title = title,
                     icon = icon
                 )
@@ -129,7 +129,7 @@ object SettingsTab : Tab {
 
             return remember {
                 TabOptions(
-                    index = 1u,
+                    index = 4u,
                     title = title,
                     icon = icon
                 )

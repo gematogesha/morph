@@ -105,9 +105,6 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.androidx.datastore.preferences)
 
-    // Markdown
-    implementation(libs.multiplatform.markdown.renderer.android)
-
     // Background Work
     implementation(libs.androidx.work.runtime.ktx)
 
