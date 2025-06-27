@@ -6,11 +6,13 @@ import com.wheatley.morph.model.challenge.Challenge
 import com.wheatley.morph.model.challenge.ChallengeDao
 import com.wheatley.morph.model.challenge.ChallengeEntry
 import com.wheatley.morph.model.challenge.ChallengeStatus
+import com.wheatley.morph.util.app.isSameDay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import java.util.Date
 
 data class ChallengeListState(
-    val challengesWithCount: List<Pair<Challenge, Int>> = emptyList()
+    val challenges: List<Triple<Challenge, Int, Boolean>> = emptyList()
 )
 
 class ChallengeListScreenModel(
@@ -29,10 +31,18 @@ class ChallengeListScreenModel(
                 dao.getAllEntries()
             ) { challenges, entries ->
                 val grouped = entries.groupBy { it.challengeId }
+                val today = Date()
 
                 challenges.map { challenge ->
-                    val doneCount = grouped[challenge.id]?.count { it.done } ?: 0
-                    challenge to doneCount
+                    val challengeEntries = grouped[challenge.id].orEmpty()
+                    val doneCount = challengeEntries.count { it.done }
+
+                    val todayDone = challengeEntries
+                        .filter { it.date.isSameDay(today) }
+                        .maxByOrNull { it.date }
+                        ?.done == true
+
+                    Triple(challenge, doneCount, todayDone)
                 }
             }.collect { result ->
                 mutableState.value = ChallengeListState(result)

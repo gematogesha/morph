@@ -67,6 +67,7 @@ import com.wheatley.morph.components.CardAction
 import com.wheatley.morph.components.CardBig
 import com.wheatley.morph.layouts.ProfileTab
 import com.wheatley.morph.model.UserPrefs
+import com.wheatley.morph.model.challenge.ChallengeStatus
 import com.wheatley.morph.model.challenge.ChallengeViewModel
 import com.wheatley.morph.model.challenge.calculateCurrentStreak
 import com.wheatley.morph.ui.theme.LocalExColorScheme
@@ -89,6 +90,7 @@ class HomeScreen: Screen {
     override fun Content() {
 
         val vm: ChallengeViewModel = viewModel()
+        val dao = vm.dao
         val context = LocalContext.current
 
         val navigator = LocalNavigator.current
@@ -191,7 +193,7 @@ class HomeScreen: Screen {
                                 number = "${completed.size}",
                                 numberColor = LocalExColorScheme.current.mint.onColorContainer,
                                 actionIcon = Icons.Outlined.ChevronRight,
-                                action = { navigator?.push(ChallengesListScreen("completed")) },
+                                action = { navigator?.push(ChallengesListScreen(ChallengeStatus.COMPLETED, dao)) }
                             )
                         }
                         item {
