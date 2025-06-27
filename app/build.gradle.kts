@@ -92,6 +92,11 @@ dependencies {
     implementation(libs.voyager.transitions)
     implementation(libs.voyager.koin)
 
+    // Koin
+    implementation(libs.koin.core)
+    implementation(libs.koin.android)
+    implementation(libs.koin.androidx.compose)
+
     // Database
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)

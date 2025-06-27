@@ -1,10 +1,10 @@
 package com.wheatley.morph.model.challenge
 
-import android.annotation.SuppressLint
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import androidx.room.TypeConverter
-import java.util.*
+import com.wheatley.morph.util.system.truncateToDay
+import java.util.Calendar
+import java.util.Date
 
 @Entity(tableName = "challenges")
 data class Challenge(
@@ -35,44 +35,6 @@ enum class ChallengeSchedule {
     CUSTOM
 }
 
-class ChallengeStatusConverter {
-    @TypeConverter
-    fun fromStatus(status: ChallengeStatus): String = status.name
-
-    @TypeConverter
-    fun toStatus(value: String): ChallengeStatus = ChallengeStatus.valueOf(value)
-}
-
-class TimeConverter {
-    @SuppressLint("DefaultLocale")
-    @TypeConverter
-    fun fromTime(time: Time?): String? {
-        return time?.let { String.format("%02d:%02d", it.hour, it.minute) }
-    }
-
-    @TypeConverter
-    fun toTime(value: String?): Time? {
-        return value?.split(":")?.takeIf { it.size == 2 }?.let {
-            Time(it[0].toIntOrNull() ?: 0, it[1].toIntOrNull() ?: 0)
-        }
-    }
-}
-
-class ChallengeColorConverter {
-    @TypeConverter
-    fun fromColor(color: ChallengeColor): String = color.name
-
-    @TypeConverter
-    fun toColor(name: String): ChallengeColor = ChallengeColor.valueOf(name.uppercase())
-}
-
-class ChallengeScheduleConverter {
-    @TypeConverter
-    fun fromSchedule(schedule: ChallengeSchedule): String = schedule.name
-
-    @TypeConverter
-    fun toSchedule(value: String): ChallengeSchedule = ChallengeSchedule.valueOf(value)
-}
 
 data class Time(val hour: Int, val minute: Int)
 
@@ -131,25 +93,4 @@ fun calculateMaxStreak(entries: List<ChallengeEntry>): Int {
     }
 
     return maxStreak
-}
-
-fun Date.truncateToDay(): Date {
-    val cal = java.util.Calendar.getInstance().apply {
-        time = this@truncateToDay
-        set(Calendar.HOUR_OF_DAY, 0)
-        set(Calendar.MINUTE,      0)
-        set(Calendar.SECOND,      0)
-        set(Calendar.MILLISECOND, 0)
-    }
-    return cal.time
-}
-
-fun daysAgo(n: Int): Date {
-    return Calendar.getInstance().apply {
-        add(Calendar.DATE, -n)
-        set(Calendar.HOUR_OF_DAY, 0)
-        set(Calendar.MINUTE, 0)
-        set(Calendar.SECOND, 0)
-        set(Calendar.MILLISECOND, 0)
-    }.time
 }

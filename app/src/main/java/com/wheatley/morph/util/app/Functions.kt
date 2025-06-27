@@ -6,6 +6,7 @@ import com.wheatley.morph.model.challenge.ChallengeColor
 import com.wheatley.morph.ui.theme.ColorFamily
 import com.wheatley.morph.ui.theme.LocalExColorScheme
 import java.time.ZoneId
+import java.util.Calendar
 import java.util.Date
 
 fun pluralDays(n: Int): String {
@@ -38,12 +39,6 @@ fun darken(color: Color, factor: Float): Color {
         blue = color.blue * (1 - factor),
         alpha = color.alpha
     )
-}
-
-fun Date.isSameDay(other: Date): Boolean {
-    val date1 = this.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
-    val date2 = other.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
-    return date1 == date2
 }
 
 @Composable

@@ -32,16 +32,10 @@ interface ChallengeDao {
 
     @Update
     suspend fun updateChallenge(challenge: Challenge)
-
 }
 
 @Database(entities = [Challenge::class, ChallengeEntry::class], version = 1)
 @TypeConverters(DateConverter::class, TimeConverter::class, ChallengeStatusConverter::class, ChallengeScheduleConverter::class, ChallengeColorConverter::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun challengeDao(): ChallengeDao
-}
-
-class DateConverter {
-    @TypeConverter fun fromDate(d: Date?): Long? = d?.time
-    @TypeConverter fun toDate(ts: Long?): Date? = ts?.let { Date(it) }
 }

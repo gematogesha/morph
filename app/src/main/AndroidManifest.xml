@@ -34,7 +34,7 @@
         </provider>
 
         <activity
-            android:name=".layouts.MainActivity"
+            android:name=".presentation.MainActivity"
             android:exported="true"
             android:theme="@style/Theme.Morph.Splash">
             <intent-filter>
@@ -43,31 +43,11 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".layouts.DashboardActivity"
+            android:name=".presentation.DashboardActivity"
             android:theme="@style/Theme.Morph">
         </activity>
         <activity
-            android:name=".layouts.onboarding.RegistrationActivity"
-            android:theme="@style/Theme.Morph">
-        </activity>
-        <activity
-            android:name=".layouts.challenge.ChallengeDetailsActivity"
-            android:theme="@style/Theme.Morph">
-        </activity>
-        <activity
-            android:name=".layouts.profile.ProfileActivity"
-            android:theme="@style/Theme.Morph">
-        </activity>
-        <activity
-            android:name=".layouts.settings.AppearanceActivity"
-            android:theme="@style/Theme.Morph">
-        </activity>
-        <activity
-            android:name=".layouts.settings.NotifyActivity"
-            android:theme="@style/Theme.Morph">
-        </activity>
-        <activity
-            android:name=".layouts.settings.AboutActivity"
+            android:name=".presentation.onboarding.RegistrationActivity"
             android:theme="@style/Theme.Morph">
         </activity>
     </application>
