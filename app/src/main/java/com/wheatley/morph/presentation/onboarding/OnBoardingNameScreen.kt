@@ -84,7 +84,7 @@ class OnBoardingNameScreen(
 
                 PrimaryButton(
                     onClick = {
-                        navigator?.push(OnBoardingNameScreen(screenModel))
+                        navigator?.push(OnBoardingPhotoScreen(screenModel))
                         screenModel.nextStep()
                     },
                     text = "Вперёд!",

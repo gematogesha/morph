@@ -9,6 +9,7 @@ import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.navigator.Navigator
 import com.wheatley.morph.model.user.UserPrefs
+import com.wheatley.morph.presentation.DashboardScreen
 import com.wheatley.morph.presentation.MainActivity
 import com.wheatley.morph.presentation.onboarding.OnBoardingFinalScreen
 import com.wheatley.morph.util.system.notification.SnackbarHelper
@@ -42,7 +43,6 @@ class OnBoardingScreenModel(
         mutableState.value = mutableState.value.copy(
             step = (mutableState.value.step + 1).coerceAtMost(MAX_STEPS)
         )
-
     }
 
     fun previousStep() {
@@ -52,7 +52,6 @@ class OnBoardingScreenModel(
     }
 
     fun save(snackbarHostState: SnackbarHostState, onSuccess: () -> Unit) {
-
         screenModelScope.launch {
             try {
                 val state = mutableState.value
@@ -65,14 +64,10 @@ class OnBoardingScreenModel(
         }
     }
 
-    fun exit() {
+    fun exit(navigator: Navigator) {
         screenModelScope.launch {
             try {
-                val intent = Intent(context, MainActivity::class.java).apply {
-                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                }
-                context.startActivity(intent)
-                (context as? Activity)?.finish()
+                navigator.replaceAll(DashboardScreen())
             } catch (e: Exception) {
                 e.printStackTrace()
             }

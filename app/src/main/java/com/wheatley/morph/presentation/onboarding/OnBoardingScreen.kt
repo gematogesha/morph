@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.model.rememberNavigatorScreenModel
+import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
@@ -33,59 +34,62 @@ import com.wheatley.morph.presentation.onboarding.model.OnBoardingScreenModel
 @SuppressLint("UnusedCrossroadTargetStateParameter", "UnusedMaterial3ScaffoldPaddingParameter",
     "StateFlowValueCalledInComposition"
 )
-@Composable
-fun OnBoardingScreen() {
 
-    val context = LocalContext.current
+class OnBoardingScreen(): Screen {
 
-    val navigator = LocalNavigator.currentOrThrow
-    val screenModel = navigator.rememberNavigatorScreenModel { OnBoardingScreenModel(context) }
-    val state by screenModel.state.collectAsState()
+    @Composable
+    override fun Content() {
+        val context = LocalContext.current
 
-    val currentStep = state.step
+        val navigator = LocalNavigator.currentOrThrow
+        val screenModel = navigator.rememberNavigatorScreenModel { OnBoardingScreenModel(context) }
+        val state by screenModel.state.collectAsState()
 
-    val animatedProgress by animateFloatAsState(
-        targetValue = (currentStep.coerceIn(0, 4)) / 4f,
-        animationSpec = tween(300),
-        label = "animatedProgress"
-    )
+        val currentStep = state.step
 
-    Scaffold(
-        content = { innerPadding ->
-            Surface(
-                color = Color.Transparent,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(
-                        brush = Brush.linearGradient(
-                            colors = listOf(
-                                Color(0xFF00C6FF),
-                                Color(0xFF0072FF)
-                            ),
-                            start = Offset(0f, 0f),
-                            end = Offset(1000f, 1000f)
-                        )
-                    )
-            ) {
-                Column(
+        val animatedProgress by animateFloatAsState(
+            targetValue = (currentStep.coerceIn(0, 4)) / 4f,
+            animationSpec = tween(300),
+            label = "animatedProgress"
+        )
+
+        Scaffold(
+            content = { innerPadding ->
+                Surface(
+                    color = Color.Transparent,
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(innerPadding)
-                        .padding(horizontal = 56.dp)
-
+                        .background(
+                            brush = Brush.linearGradient(
+                                colors = listOf(
+                                    Color(0xFF00C6FF),
+                                    Color(0xFF0072FF)
+                                ),
+                                start = Offset(0f, 0f),
+                                end = Offset(1000f, 1000f)
+                            )
+                        )
                 ) {
-                    LinearWavyProgressIndicator(
-                        progress = { animatedProgress },
+                    Column(
                         modifier = Modifier
-                            .padding(vertical = 16.dp)
-                            .fillMaxWidth()
-                    )
-                    Navigator(OnBoardingGreetingScreen(screenModel)) { navigator ->
-                        SlideTransition(navigator)
-                    }
+                            .fillMaxSize()
+                            .padding(innerPadding)
+                            .padding(horizontal = 56.dp)
 
+                    ) {
+                        LinearWavyProgressIndicator(
+                            progress = { animatedProgress },
+                            modifier = Modifier
+                                .padding(vertical = 16.dp)
+                                .fillMaxWidth()
+                        )
+                        Navigator(OnBoardingGreetingScreen(screenModel)) { navigator ->
+                            SlideTransition(navigator)
+                        }
+
+                    }
                 }
             }
-        }
-    )
+        )
+    }
 }
