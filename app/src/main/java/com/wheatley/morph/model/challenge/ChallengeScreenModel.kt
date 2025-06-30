@@ -1,17 +1,25 @@
 package com.wheatley.morph.model.challenge
 
+import androidx.media3.common.util.Log
+import androidx.media3.common.util.UnstableApi
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.wheatley.morph.model.challenge.repository.ChallengeRepository
-import com.wheatley.morph.util.system.date.isSameDay
+import com.wheatley.morph.util.system.date.truncateToDay
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.util.Date
 
 data class ChallengesState(
     val challenges: List<Challenge> = emptyList(),
@@ -23,103 +31,102 @@ data class ChallengesState(
     val maxStreak: Int = 0
 )
 
+@UnstableApi
 class ChallengeScreenModel(
     private val repository: ChallengeRepository
 ) : ScreenModel {
 
-    private val _state = MutableStateFlow(ChallengesState())
-    val state: StateFlow<ChallengesState> = _state.asStateFlow()
+    private val scope: CoroutineScope = screenModelScope
 
-    init {
-        loadAllData()
-    }
+    private val _error = MutableStateFlow<String?>(null)
+    val error: StateFlow<String?> = _error.asStateFlow()
 
-    private fun loadAllData() {
-        _state.update { it.copy(isLoading = true) }
+    val state: StateFlow<ChallengesState> = combine(
+        repository.getAllChallenges(),
+        repository.getAllEntries()
+    ) { challenges, entries ->
+        val inProgress = challenges.filter { it.status == ChallengeStatus.IN_PROGRESS }
+        val completed = challenges.filter { it.status == ChallengeStatus.COMPLETED }
 
-        screenModelScope.launch {
+        val currentStreak = calculateCurrentStreak(entries)
+        val maxStreak = calculateMaxStreak(entries)
+
+        ChallengesState(
+            challenges = challenges,
+            inProgressChallenges = inProgress,
+            completedChallenges = completed,
+            currentStreak = currentStreak,
+            maxStreak = maxStreak,
+            isLoading = false,
+            error = null
+        )
+    }.stateIn(
+        scope,
+        kotlinx.coroutines.flow.SharingStarted.WhileSubscribed(5000),
+        ChallengesState(isLoading = true)
+    )
+
+    fun toggleChallengeCompletion(challengeId: Long, date: java.util.Date, completed: Boolean) {
+        scope.launch {
             try {
-                repository.getAllChallenges().collect { challenges ->
-                    val inProgress = challenges.filter { it.status == ChallengeStatus.IN_PROGRESS }
-                    val completed = challenges.filter { it.status == ChallengeStatus.COMPLETED }
-
-                    _state.update {
-                        it.copy(
-                            challenges = challenges,
-                            inProgressChallenges = inProgress,
-                            completedChallenges = completed,
-                            isLoading = false,
-                            error = null
-                        )
-                    }
-                }
+                repository.toggleChallengeCompletion(challengeId, date, completed)
             } catch (e: Exception) {
-                _state.update {
-                    it.copy(
-                        isLoading = false,
-                        error = e.message ?: "Failed to load challenges"
-                    )
-                }
+                _error.update { e.message ?: "Failed to toggle completion" }
             }
         }
     }
 
+    fun getChallenge(challengeId: Long) = repository.getChallengeById(challengeId)
+
+    fun getChallengeStatusForDate(challengeId: Long, date: java.util.Date) =
+        repository.getChallengeEntries(challengeId)
+            .map { entries ->
+                val targetDay = date.toInstant().truncatedTo(java.time.temporal.ChronoUnit.DAYS)
+                entries.find { it.date.toInstant().truncatedTo(java.time.temporal.ChronoUnit.DAYS) == targetDay }?.done
+            }
+
     fun addChallenge(challenge: Challenge) {
-        screenModelScope.launch {
+        scope.launch {
             try {
                 repository.addChallenge(challenge)
             } catch (e: Exception) {
-                _state.update {
-                    it.copy(error = e.message ?: "Failed to add challenge")
-                }
+                _error.update { e.message ?: "Failed to add challenge" }
             }
         }
     }
 
-    fun getChallenge(challengeId: Long): Flow<Challenge?> {
-        return repository.getChallengeById(challengeId)
-    }
-
     fun updateChallenge(challenge: Challenge) {
-        screenModelScope.launch {
+        scope.launch {
             try {
                 repository.updateChallenge(challenge)
             } catch (e: Exception) {
-                _state.update {
-                    it.copy(error = e.message ?: "Failed to update challenge")
-                }
+                _error.update { e.message ?: "Failed to update challenge" }
             }
         }
     }
 
     fun deleteChallenge(challenge: Challenge) {
-        screenModelScope.launch {
+        scope.launch {
             try {
                 repository.deleteChallenge(challenge)
             } catch (e: Exception) {
-                _state.update {
-                    it.copy(error = e.message ?: "Failed to delete challenge")
-                }
+                _error.update { e.message ?: "Failed to delete challenge" }
             }
         }
     }
 
-    fun toggleChallengeCompletion(challengeId: Long, date: Date, completed: Boolean) {
-        screenModelScope.launch {
+    fun getCompletedDaysCount(challenge: Challenge) {
+        scope.launch {
             try {
-                repository.toggleChallengeCompletion(challengeId, date, completed)
+                repository.deleteChallenge(challenge)
             } catch (e: Exception) {
-                _state.update {
-                    it.copy(error = e.message ?: "Failed to toggle completion")
-                }
+                _error.update { e.message ?: "Failed to delete challenge" }
             }
         }
     }
 
-    fun getChallengeStatusForDate(challengeId: Long, date: Date): Flow<Boolean?> {
-        return repository.getChallengeEntries(challengeId)
-            .map { entries ->
-                entries.find { it.date.isSameDay(date) }?.done
-            }
+    fun getCompletedDaysCount(challengeId: Long): Flow<Int> {
+        return repository.getCompletedDaysCount(challengeId)
     }
+
 }

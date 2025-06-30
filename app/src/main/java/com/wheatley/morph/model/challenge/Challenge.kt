@@ -49,18 +49,26 @@ data class ChallengeEntry(
 )
 
 fun calculateCurrentStreak(entries: List<ChallengeEntry>): Int {
-    val grouped = entries.groupBy { it.date.truncateToDay() }
-    val cal = Calendar.getInstance()
+    val grouped = entries
+        .filter { it.done }
+        .groupBy { it.date.truncateToDay() }
+
+    if (grouped.isEmpty()) return 0
+
+    val days = grouped.keys.sortedDescending()
     var streak = 0
+    var cal = days.first()
 
     while (true) {
-        val day = cal.time.truncateToDay()
-        val tasks = grouped[day]
-
-        if (tasks == null || tasks.any { !it.done }) break
-
+        if (cal !in grouped) break
         streak++
-        cal.add(Calendar.DATE, -1)
+
+        val next = Calendar.getInstance().apply {
+            time = cal
+            add(Calendar.DATE, -1)
+        }.time.truncateToDay()
+
+        cal = next
     }
 
     return streak
