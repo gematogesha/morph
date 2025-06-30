@@ -12,7 +12,10 @@ interface ChallengeRepository {
     fun getAllEntries(): Flow<List<ChallengeEntry>>
     fun getChallengeEntries(challengeId: Long): Flow<List<ChallengeEntry>>
     fun getChallengesByStatus(status: ChallengeStatus): Flow<List<Challenge>>
+    fun getCompletedDaysCount(challengeId: Long): Flow<Int>
 
+    suspend fun getCurrentStreak(): Int
+    suspend fun getMaxStreak(): Int
     suspend fun addChallenge(challenge: Challenge)
     suspend fun updateChallenge(challenge: Challenge)
     suspend fun deleteChallenge(challenge: Challenge)

@@ -4,7 +4,11 @@ import com.wheatley.morph.model.challenge.Challenge
 import com.wheatley.morph.model.challenge.ChallengeDao
 import com.wheatley.morph.model.challenge.ChallengeEntry
 import com.wheatley.morph.model.challenge.ChallengeStatus
+import com.wheatley.morph.model.challenge.calculateCurrentStreak
+import com.wheatley.morph.model.challenge.calculateMaxStreak
+import com.wheatley.morph.util.system.date.truncateToDay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import java.util.Date
 
@@ -19,25 +23,22 @@ class ChallengeRepositoryImpl(
     override fun getChallengesByStatus(status: ChallengeStatus): Flow<List<Challenge>> =
         dao.getChallengesByStatus(status)
 
-    override fun getChallengeEntries(challengeId: Long): Flow<List<ChallengeEntry>> {
-        return dao.getEntriesForChallenge(challengeId)
+    override fun getCompletedDaysCount(challengeId: Long): Flow<Int> {
+        return dao.getCompletedDaysCount(challengeId)
     }
 
-    override fun getAllEntries(): Flow<List<ChallengeEntry>> {
-        return dao.getAllEntries()
-    }
+    override fun getChallengeEntries(challengeId: Long): Flow<List<ChallengeEntry>> =
+        dao.getEntriesForChallenge(challengeId)
+
+    override fun getAllEntries(): Flow<List<ChallengeEntry>> = dao.getAllEntries()
 
     override suspend fun addChallenge(challenge: Challenge) {
         dao.insertChallenge(challenge)
     }
 
-    override suspend fun updateChallenge(challenge: Challenge) {
-        dao.updateChallenge(challenge)
-    }
+    override suspend fun updateChallenge(challenge: Challenge)  = dao.updateChallenge(challenge)
 
-    override suspend fun deleteChallenge(challenge: Challenge) {
-        dao.deleteChallenge(challenge)
-    }
+    override suspend fun deleteChallenge(challenge: Challenge) = dao.deleteChallengeAndEntries(challenge)
 
     private suspend fun updateChallengeStatus(challengeId: Long) {
         val challenge = dao.getChallengeById(challengeId).firstOrNull() ?: return
@@ -60,7 +61,34 @@ class ChallengeRepositoryImpl(
         date: Date,
         completed: Boolean
     ) {
-        dao.upsertEntry(ChallengeEntry(challengeId, date, completed))
+        val dayDate = date.truncateToDay()
+
+        val entries = dao.getChallengeEntries(challengeId)
+        val existing = entries.find { it.date.truncateToDay() == dayDate }
+
+        if (existing != null && existing.done == completed) {
+            return
+        }
+
+        dao.upsertEntry(
+            ChallengeEntry(
+                challengeId = challengeId,
+                date = dayDate,
+                done = completed
+            )
+        )
+
         updateChallengeStatus(challengeId)
     }
+
+    override suspend fun getCurrentStreak(): Int {
+        val entries = dao.getAllEntries().first()
+        return calculateCurrentStreak(entries)
+    }
+
+    override suspend fun getMaxStreak(): Int {
+        val entries = dao.getAllEntries().first()
+        return calculateMaxStreak(entries)
+    }
+
 }
