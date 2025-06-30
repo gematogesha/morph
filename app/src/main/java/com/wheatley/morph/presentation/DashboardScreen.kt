@@ -29,6 +29,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.tab.CurrentTab
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.Tab
@@ -38,58 +39,61 @@ import com.wheatley.morph.util.update.UpdateChecker
 import kotlinx.coroutines.launch
 
 //TODO: Реализовать ViewModel ВО ВСЕХ Screen с .launch
-@Composable
-fun DashboardScreen() {
 
-    val context = LocalContext.current
-    val scope = rememberCoroutineScope()
+class DashboardScreen(): Screen {
 
-    var showSheet by remember { mutableStateOf(false) }
-    var updateVersion by remember { mutableStateOf("") }
-    var updateChangelog by remember { mutableStateOf("") }
-    var updateDownload by remember { mutableStateOf("") }
+    @Composable
+    override fun Content() {
+        val context = LocalContext.current
+        val scope = rememberCoroutineScope()
 
-    val snackbarHostState = remember { SnackbarHostState() }
+        var showSheet by remember { mutableStateOf(false) }
+        var updateVersion by remember { mutableStateOf("") }
+        var updateChangelog by remember { mutableStateOf("") }
+        var updateDownload by remember { mutableStateOf("") }
 
-    val tabs = listOf(HomeTab, StatisticsTab, ChallengeAddTab, ProfileTab, SettingsTab)
+        val snackbarHostState = remember { SnackbarHostState() }
 
-    LaunchedEffect(Unit) {
-        scope.launch {
-            UpdateChecker(context).checkVersion(
-                snackbarHostState = snackbarHostState,
-                onNewUpdate = { version, changelog, link ->
-                    updateVersion = version
-                    updateChangelog = changelog
-                    updateDownload = link
-                    showSheet = true
-                },
-                onFinish = { /* optional */ }
+        val tabs = listOf(HomeTab, StatisticsTab, ChallengeAddTab, ProfileTab, SettingsTab)
+
+        LaunchedEffect(Unit) {
+            scope.launch {
+                UpdateChecker(context).checkVersion(
+                    snackbarHostState = snackbarHostState,
+                    onNewUpdate = { version, changelog, link ->
+                        updateVersion = version
+                        updateChangelog = changelog
+                        updateDownload = link
+                        showSheet = true
+                    },
+                    onFinish = { /* optional */ }
+                )
+            }
+        }
+
+        if (showSheet) {
+            UpdateScreen(
+                versionName = updateVersion,
+                changelogInfo = updateChangelog,
+                downloadLink = updateDownload,
+                showSheet = showSheet,
+                onDismiss = { showSheet = false }
             )
         }
-    }
 
-    if (showSheet) {
-        UpdateScreen(
-            versionName = updateVersion,
-            changelogInfo = updateChangelog,
-            downloadLink = updateDownload,
-            showSheet = showSheet,
-            onDismiss = { showSheet = false }
-        )
-    }
-
-    TabNavigator(HomeTab) {
-        Scaffold(
-            bottomBar = {
-                NavigationBar {
-                    tabs.forEach { tab ->
-                        TabNavigationItem(tab)
+        TabNavigator(HomeTab) {
+            Scaffold(
+                bottomBar = {
+                    NavigationBar {
+                        tabs.forEach { tab ->
+                            TabNavigationItem(tab)
+                        }
                     }
                 }
-            }
-        ) {
-            Box(modifier = Modifier.padding(bottom = it.calculateBottomPadding())) {
-                CurrentTab()
+            ) {
+                Box(modifier = Modifier.padding(bottom = it.calculateBottomPadding())) {
+                    CurrentTab()
+                }
             }
         }
     }
