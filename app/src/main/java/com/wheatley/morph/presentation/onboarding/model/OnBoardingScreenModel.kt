@@ -1,8 +1,6 @@
 package com.wheatley.morph.presentation.onboarding.model
 
-import android.app.Activity
 import android.content.Context
-import android.content.Intent
 import android.net.Uri
 import androidx.compose.material3.SnackbarHostState
 import cafe.adriel.voyager.core.model.StateScreenModel
@@ -10,8 +8,6 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.navigator.Navigator
 import com.wheatley.morph.model.user.UserPrefs
 import com.wheatley.morph.presentation.DashboardScreen
-import com.wheatley.morph.presentation.MainActivity
-import com.wheatley.morph.presentation.onboarding.OnBoardingFinalScreen
 import com.wheatley.morph.util.system.notification.SnackbarHelper
 import kotlinx.coroutines.launch
 

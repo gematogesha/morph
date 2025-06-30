@@ -6,8 +6,8 @@ import com.wheatley.morph.BuildConfig
 import com.wheatley.morph.R
 import com.wheatley.morph.util.release.GetApplicationRelease
 import com.wheatley.morph.util.release.ReleaseServiceImpl
-import com.wheatley.morph.util.system.notification.SnackbarHelper
 import com.wheatley.morph.util.system.isPreviewBuildType
+import com.wheatley.morph.util.system.notification.SnackbarHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
