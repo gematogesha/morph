@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -22,6 +23,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -49,14 +51,18 @@ data class ChallengesListScreen(
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-
-        val challenges = screenModel.state.value.challenges
+        val state by screenModel.state.collectAsState()
 
         val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
         val label = when (status) {
             ChallengeStatus.IN_PROGRESS -> "В процессе"
             ChallengeStatus.COMPLETED -> "Завершённые"
+        }
+
+        val challenges = when (status) {
+            ChallengeStatus.IN_PROGRESS -> state.inProgressChallenges
+            ChallengeStatus.COMPLETED -> state.completedChallenges
         }
 
         Scaffold(
@@ -84,10 +90,16 @@ data class ChallengesListScreen(
                         .padding(horizontal = 16.dp)
                 ) {
                     items(challenges) { challenge ->
-                        val status by screenModel.getChallengeStatusForDate(challenge.id, Date())
-                            .collectAsState(initial = null)
+                        val statusFlow = remember(challenge.id) {
+                            screenModel.getChallengeStatusForDate(challenge.id, Date())
+                        }
+                        val isChecked by statusFlow.collectAsState(initial = false)
 
-                        ChallengeCard(challenge)
+                        val completedDays by screenModel.getCompletedDaysCount(challenge.id).collectAsState(initial = 0)
+
+                        Text("Выполнено $completedDays из ${challenge.duration}")
+
+                        ChallengeCard(challenge, completedDays)
 
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
@@ -106,8 +118,15 @@ data class ChallengesListScreen(
                                 color = challenge.color.color()
                             )
 
+                            IconButton(
+                                onClick = { screenModel.deleteChallenge(challenge) },
+                                modifier = Modifier.padding(end = 8.dp)
+                            ) {
+                                Icon(Icons.Outlined.Delete, contentDescription = "Удалить")
+                            }
+
                             Checkbox(
-                                checked = status ?: false,
+                                checked = isChecked ?: false,
                                 onCheckedChange = { checked ->
                                     screenModel.toggleChallengeCompletion(challenge.id, Date(), checked)
                                 }

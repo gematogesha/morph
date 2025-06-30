@@ -158,7 +158,9 @@ data class ChallengesByDateScreen(
                             val status by screenModel.getChallengeStatusForDate(challenge.id, Date())
                                 .collectAsState(initial = null)
 
-                            ChallengeCard(challenge)
+                            val completedDays by screenModel.getCompletedDaysCount(challenge.id).collectAsState(initial = 0)
+
+                            ChallengeCard(challenge, completedDays)
 
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,

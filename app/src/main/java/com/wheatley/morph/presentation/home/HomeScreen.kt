@@ -268,7 +268,7 @@ fun CalendarGrid(
                     val isToday = date == today
                     val isCurrentMonth = date.month == currentMonth.month
                     val textColor = when {
-                        isToday && isCurrentMonth -> MaterialTheme.colorScheme.onPrimary
+                        isToday -> MaterialTheme.colorScheme.onPrimary
                         isCurrentMonth -> MaterialTheme.colorScheme.onSurface
                         else -> MaterialTheme.colorScheme.outlineVariant
                     }
