@@ -7,6 +7,8 @@ import com.wheatley.morph.model.challenge.ChallengeDao
 import com.wheatley.morph.model.challenge.ChallengeScreenModel
 import com.wheatley.morph.model.challenge.repository.ChallengeRepository
 import com.wheatley.morph.model.challenge.repository.ChallengeRepositoryImpl
+import com.wheatley.morph.presentation.add.model.ChallengeAddScreenModel
+import com.wheatley.morph.presentation.onboarding.model.OnBoardingScreenModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 import org.koin.core.module.dsl.singleOf
@@ -47,6 +49,14 @@ object DiModules {
     val screenModelModule = module {
         factory { ChallengeScreenModel(get()) }
     }
+
+    val addChallengeModule = module {
+        factory { ChallengeAddScreenModel(get()) } // get() = ChallengeRepository
+    }
+
+    val onBoardingModule = module {
+        factory { OnBoardingScreenModel(get()) }
+    }
 }
 
 fun initKoinModules(context: Context) {
@@ -55,7 +65,9 @@ fun initKoinModules(context: Context) {
         modules(
             DiModules.databaseModule,
             DiModules.repositoryModule,
-            DiModules.screenModelModule
+            DiModules.screenModelModule,
+            DiModules.addChallengeModule,
+            DiModules.onBoardingModule,
         )
     }
 }
