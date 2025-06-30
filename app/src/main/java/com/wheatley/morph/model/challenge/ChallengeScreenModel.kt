@@ -1,21 +1,14 @@
 package com.wheatley.morph.model.challenge
 
-import androidx.media3.common.util.Log
-import androidx.media3.common.util.UnstableApi
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.wheatley.morph.model.challenge.repository.ChallengeRepository
-import com.wheatley.morph.util.system.date.truncateToDay
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -31,7 +24,6 @@ data class ChallengesState(
     val maxStreak: Int = 0
 )
 
-@UnstableApi
 class ChallengeScreenModel(
     private val repository: ChallengeRepository
 ) : ScreenModel {
