@@ -1,4 +1,4 @@
-package com.wheatley.morph.util.system
+package com.wheatley.morph.util.system.notification
 
 import android.app.NotificationChannel
 import android.app.NotificationManager

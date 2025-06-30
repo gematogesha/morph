@@ -1,12 +1,12 @@
 package com.wheatley.morph.presentation.home.model
 
-import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.core.model.StateScreenModel
+import cafe.adriel.voyager.core.model.screenModelScope
 import com.wheatley.morph.model.challenge.Challenge
 import com.wheatley.morph.model.challenge.ChallengeDao
 import com.wheatley.morph.model.challenge.ChallengeEntry
 import com.wheatley.morph.model.challenge.ChallengeStatus
-import com.wheatley.morph.util.app.isSameDay
+import com.wheatley.morph.util.system.date.isSameDay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.util.Date

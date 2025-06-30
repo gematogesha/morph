@@ -3,8 +3,8 @@ package com.wheatley.morph.util.app
 import android.content.Context
 import com.wheatley.morph.BuildConfig
 import com.wheatley.morph.R
-import com.wheatley.morph.util.date.DateFormatStyle
-import com.wheatley.morph.util.date.DateFormatter
+import com.wheatley.morph.util.system.date.DateFormatStyle
+import com.wheatley.morph.util.system.date.DateFormatter
 import com.wheatley.morph.util.system.isPreviewBuildType
 
 object AppInfo {

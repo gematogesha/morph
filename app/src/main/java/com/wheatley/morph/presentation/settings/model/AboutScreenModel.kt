@@ -3,8 +3,8 @@ package com.wheatley.morph.presentation.settings.model
 import android.content.Context
 import androidx.compose.material3.SnackbarHostState
 import cafe.adriel.voyager.core.model.StateScreenModel
-import com.wheatley.morph.util.update.UpdateChecker
 import cafe.adriel.voyager.core.model.screenModelScope
+import com.wheatley.morph.util.update.UpdateChecker
 import kotlinx.coroutines.launch
 
 data class AboutScreenState(

@@ -34,8 +34,8 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.wheatley.morph.presentation.components.SettingsItem
 import com.wheatley.morph.presentation.components.SettingsLabel
-import com.wheatley.morph.util.date.DateFormatStyle
-import com.wheatley.morph.util.date.DateFormatter
+import com.wheatley.morph.util.system.date.DateFormatStyle
+import com.wheatley.morph.util.system.date.DateFormatter
 import com.wheatley.morph.util.setting.SettingsKeys
 import com.wheatley.morph.util.setting.SettingsManager
 import com.wheatley.morph.util.ui.ThemeManager

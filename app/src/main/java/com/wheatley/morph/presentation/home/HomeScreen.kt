@@ -56,33 +56,27 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.media3.common.util.UnstableApi
-import cafe.adriel.voyager.core.model.rememberNavigatorScreenModel
 import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.koin.getScreenModel
 import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import coil.compose.rememberAsyncImagePainter
+import com.wheatley.morph.model.challenge.ChallengeScreenModel
+import com.wheatley.morph.model.challenge.ChallengeStatus
+import com.wheatley.morph.model.user.UserPrefs
+import com.wheatley.morph.presentation.ProfileTab
 import com.wheatley.morph.presentation.components.CardAction
 import com.wheatley.morph.presentation.components.CardBig
-import com.wheatley.morph.presentation.ProfileTab
-import com.wheatley.morph.model.challenge.repository.ChallengeRepository
-import com.wheatley.morph.model.challenge.ChallengeScreenModel
-import com.wheatley.morph.model.user.UserPrefs
-import com.wheatley.morph.model.challenge.ChallengeStatus
-import com.wheatley.morph.model.challenge.calculateCurrentStreak
 import com.wheatley.morph.ui.theme.LocalExColorScheme
 import com.wheatley.morph.util.app.pluralDays
-import org.koin.core.context.GlobalContext.get
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.TextStyle
 import java.time.temporal.ChronoUnit
 import java.time.temporal.TemporalAdjusters
-import java.util.*
+import java.util.Locale
 
 @androidx.annotation.OptIn(UnstableApi::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")

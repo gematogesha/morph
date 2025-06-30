@@ -1,11 +1,12 @@
 package com.wheatley.morph.presentation.add.model
 
-import cafe.adriel.voyager.core.model.screenModelScope
 import androidx.compose.material3.SnackbarHostState
 import cafe.adriel.voyager.core.model.StateScreenModel
+import cafe.adriel.voyager.core.model.screenModelScope
+import com.wheatley.morph.model.challenge.Challenge
 import com.wheatley.morph.model.challenge.ChallengeColor
-import com.wheatley.morph.model.challenge.ChallengeViewModel
-import com.wheatley.morph.util.system.SnackbarHelper
+import com.wheatley.morph.model.challenge.repository.ChallengeRepository
+import com.wheatley.morph.util.system.notification.SnackbarHelper
 import kotlinx.coroutines.launch
 
 data class ChallengeAddState(
@@ -18,7 +19,7 @@ data class ChallengeAddState(
 )
 
 class ChallengeAddScreenModel(
-    private val vm: ChallengeViewModel
+    private val repository: ChallengeRepository
 ) : StateScreenModel<ChallengeAddState>(ChallengeAddState()) {
 
     fun updateName(name: String) {
@@ -50,11 +51,13 @@ class ChallengeAddScreenModel(
         screenModelScope.launch {
             mutableState.value = state.copy(isSaving = true)
 
-            vm.addChallenge(
-                name = state.name.trim(),
-                emoji = state.emoji.trim(),
-                duration = state.duration,
-                color = state.color
+            repository.addChallenge(
+                Challenge(
+                    name = state.name.trim(),
+                    emoji = state.emoji.trim(),
+                    duration = state.duration,
+                    color = state.color
+                ),
             )
 
             mutableState.value = ChallengeAddState(resetTrigger = true) // сброс формы

@@ -65,13 +65,12 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.koin.koinScreenModel
 import com.wheatley.morph.R
-import com.wheatley.morph.presentation.components.CustomTextField
-import com.wheatley.morph.presentation.add.model.ChallengeAddScreenModel
 import com.wheatley.morph.model.challenge.ChallengeColor
-import com.wheatley.morph.model.challenge.ChallengeViewModel
+import com.wheatley.morph.presentation.add.model.ChallengeAddScreenModel
+import com.wheatley.morph.presentation.components.CustomTextField
 import com.wheatley.morph.ui.theme.ColorFamily
 import com.wheatley.morph.ui.theme.LocalExColorScheme
 import com.wheatley.morph.util.app.pluralDays
@@ -82,8 +81,7 @@ import kotlinx.coroutines.launch
 class ChallengeAddScreen : Screen {
     @Composable
     override fun Content() {
-        val vm: ChallengeViewModel = viewModel()
-        val screenModel = remember { ChallengeAddScreenModel(vm) }
+        val screenModel = koinScreenModel<ChallengeAddScreenModel>()
         val state by screenModel.state.collectAsState()
 
         val snackbarHostState = remember { SnackbarHostState() }

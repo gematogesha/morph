@@ -1,5 +1,5 @@
 
-package com.wheatley.morph.util.date
+package com.wheatley.morph.util.system.date
 
 enum class DateFormatStyle(val pattern: String) {
     DAY_MONTH("d MMMM"),

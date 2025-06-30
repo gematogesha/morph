@@ -3,7 +3,7 @@ package com.wheatley.morph.model.challenge
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.wheatley.morph.model.challenge.repository.ChallengeRepository
-import com.wheatley.morph.util.system.isSameDay
+import com.wheatley.morph.util.system.date.isSameDay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

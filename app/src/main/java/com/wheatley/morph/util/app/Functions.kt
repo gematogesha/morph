@@ -5,9 +5,6 @@ import androidx.compose.ui.graphics.Color
 import com.wheatley.morph.model.challenge.ChallengeColor
 import com.wheatley.morph.ui.theme.ColorFamily
 import com.wheatley.morph.ui.theme.LocalExColorScheme
-import java.time.ZoneId
-import java.util.Calendar
-import java.util.Date
 
 fun pluralDays(n: Int): String {
     val rem100 = n % 100

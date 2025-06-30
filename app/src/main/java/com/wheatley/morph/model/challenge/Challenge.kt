@@ -2,7 +2,7 @@ package com.wheatley.morph.model.challenge
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.wheatley.morph.util.system.truncateToDay
+import com.wheatley.morph.util.system.date.truncateToDay
 import java.util.Calendar
 import java.util.Date
 

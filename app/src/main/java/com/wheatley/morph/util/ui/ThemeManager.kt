@@ -1,8 +1,9 @@
 package com.wheatley.morph.util.ui
 
 import android.content.Context
-import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.core.content.edit
 
 object ThemeManager {

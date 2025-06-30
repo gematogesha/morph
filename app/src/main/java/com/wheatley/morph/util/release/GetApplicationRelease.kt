@@ -1,9 +1,9 @@
 package com.wheatley.morph.util.release
 
 import android.content.Context
+import androidx.core.content.edit
 import java.time.Instant
 import java.time.temporal.ChronoUnit
-import androidx.core.content.edit
 
 class GetApplicationRelease(
     private val context: Context,
