@@ -76,7 +76,7 @@ data class ChallengesByDateScreen(
         val context = LocalContext.current
         val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
-        val challenges = screenModel.uiState.value.inProgressChallenges
+        val challenges = screenModel.state.value.inProgressChallenges
 
         val relativeDate =
             SettingsManager.getBoolean(context, SettingsKeys.RELATIVE_TIMESTAMPS, true)

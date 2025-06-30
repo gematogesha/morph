@@ -95,16 +95,17 @@ class HomeScreen: Screen {
         val tabNavigator = LocalTabNavigator.current
 
         val screenModel = koinScreenModel<ChallengeScreenModel>()
+        val state by screenModel.state.collectAsState()
 
         val userNameFlow = remember { UserPrefs.getUserNameFlow(context) }
         val photoUriFlow = remember { UserPrefs.getUserPhotoFlow(context) }
         val userName by userNameFlow.collectAsState(initial = "")
         val photoUri by photoUriFlow.collectAsState(initial = null)
 
-        val currentStreak = screenModel.uiState.value.currentStreak
+        val currentStreak = state.currentStreak
 
-        val inProgress = screenModel.uiState.value.inProgressChallenges
-        val completed = screenModel.uiState.value.completedChallenges
+        val inProgress = state.inProgressChallenges
+        val completed = state.completedChallenges
 
         var selectedDate by remember { mutableStateOf<LocalDate?>(null) }
 

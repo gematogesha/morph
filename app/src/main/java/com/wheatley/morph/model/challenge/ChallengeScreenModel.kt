@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.Date
 
-data class ChallengesUiState(
+data class ChallengesState(
     val challenges: List<Challenge> = emptyList(),
     val inProgressChallenges: List<Challenge> = emptyList(),
     val completedChallenges: List<Challenge> = emptyList(),
@@ -27,15 +27,15 @@ class ChallengeScreenModel(
     private val repository: ChallengeRepository
 ) : ScreenModel {
 
-    private val _uiState = MutableStateFlow(ChallengesUiState())
-    val uiState: StateFlow<ChallengesUiState> = _uiState.asStateFlow()
+    private val _state = MutableStateFlow(ChallengesState())
+    val state: StateFlow<ChallengesState> = _state.asStateFlow()
 
     init {
         loadAllData()
     }
 
     private fun loadAllData() {
-        _uiState.update { it.copy(isLoading = true) }
+        _state.update { it.copy(isLoading = true) }
 
         screenModelScope.launch {
             try {
@@ -43,7 +43,7 @@ class ChallengeScreenModel(
                     val inProgress = challenges.filter { it.status == ChallengeStatus.IN_PROGRESS }
                     val completed = challenges.filter { it.status == ChallengeStatus.COMPLETED }
 
-                    _uiState.update {
+                    _state.update {
                         it.copy(
                             challenges = challenges,
                             inProgressChallenges = inProgress,
@@ -54,7 +54,7 @@ class ChallengeScreenModel(
                     }
                 }
             } catch (e: Exception) {
-                _uiState.update {
+                _state.update {
                     it.copy(
                         isLoading = false,
                         error = e.message ?: "Failed to load challenges"
@@ -69,7 +69,7 @@ class ChallengeScreenModel(
             try {
                 repository.addChallenge(challenge)
             } catch (e: Exception) {
-                _uiState.update {
+                _state.update {
                     it.copy(error = e.message ?: "Failed to add challenge")
                 }
             }
@@ -85,7 +85,7 @@ class ChallengeScreenModel(
             try {
                 repository.updateChallenge(challenge)
             } catch (e: Exception) {
-                _uiState.update {
+                _state.update {
                     it.copy(error = e.message ?: "Failed to update challenge")
                 }
             }
@@ -97,7 +97,7 @@ class ChallengeScreenModel(
             try {
                 repository.deleteChallenge(challenge)
             } catch (e: Exception) {
-                _uiState.update {
+                _state.update {
                     it.copy(error = e.message ?: "Failed to delete challenge")
                 }
             }
@@ -109,7 +109,7 @@ class ChallengeScreenModel(
             try {
                 repository.toggleChallengeCompletion(challengeId, date, completed)
             } catch (e: Exception) {
-                _uiState.update {
+                _state.update {
                     it.copy(error = e.message ?: "Failed to toggle completion")
                 }
             }

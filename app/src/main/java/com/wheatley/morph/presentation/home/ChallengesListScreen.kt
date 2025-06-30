@@ -50,7 +50,7 @@ data class ChallengesListScreen(
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
 
-        val challenges = screenModel.uiState.value.challenges
+        val challenges = screenModel.state.value.challenges
 
         val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 

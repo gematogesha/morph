@@ -30,7 +30,7 @@ class UpdateDownloader(
 
     override suspend fun doWork(): Result {
         val url = inputData.getString(EXTRA_DOWNLOAD_URL) ?: return Result.failure()
-        val title = inputData.getString(EXTRA_DOWNLOAD_TITLE) ?: "Morph Update"
+        //val title = inputData.getString(EXTRA_DOWNLOAD_TITLE) ?: "Morph Update"
 
         createNotificationChannel()
 
