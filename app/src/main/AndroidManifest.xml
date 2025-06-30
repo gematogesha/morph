@@ -42,14 +42,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".presentation.DashboardActivity"
-            android:theme="@style/Theme.Morph">
-        </activity>
-        <activity
-            android:name=".presentation.onboarding.RegistrationActivity"
-            android:theme="@style/Theme.Morph">
-        </activity>
     </application>
 
 </manifest>

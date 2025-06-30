@@ -7,10 +7,16 @@ import androidx.navigation.compose.composable
 import com.wheatley.morph.presentation.onboarding.OnBoardingScreen
 
 @Composable
-fun AppNavHost(navController: NavHostController) {
-    NavHost(navController, startDestination = "splash") {
-        composable("splash") { SplashScreen() }
-        composable("registration") { OnBoardingScreen() }
-        composable("dashboard") { DashboardScreen() }
+fun AppNavHost(
+    navController: NavHostController,
+    startDestination: String
+) {
+    NavHost(navController = navController, startDestination = startDestination) {
+        composable("onboarding") {
+            OnBoardingScreen()
+        }
+        composable("dashboard") {
+            DashboardScreen()
+        }
     }
 }

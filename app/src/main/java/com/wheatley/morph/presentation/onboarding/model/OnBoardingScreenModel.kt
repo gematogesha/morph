@@ -21,8 +21,7 @@ data class OnBoardingScreenState(
 )
 
 class OnBoardingScreenModel(
-    val context: Context,
-    val navigator: Navigator
+    val context: Context
 ) : StateScreenModel<OnBoardingScreenState>(OnBoardingScreenState()) {
 
     val isNameValid: Boolean
