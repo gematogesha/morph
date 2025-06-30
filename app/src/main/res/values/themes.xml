@@ -1,13 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.Morph" parent="android:Theme.Material.Light.NoActionBar.Fullscreen">
-    </style>
-
-    <style name="Theme.Morph.Splash" parent="Theme.SplashScreen">
-        <item name="windowSplashScreenBackground">@color/purple_200</item>
-        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_logo</item>
-        <item name="postSplashScreenTheme">@style/Theme.Morph</item>
+    <style name="Theme.Morph" parent="Theme.Material3.DayNight.NoActionBar">
     </style>
 
 </resources>
