@@ -50,8 +50,8 @@ data class ChallengeEntry(
 
 fun calculateCurrentStreak(entries: List<ChallengeEntry>): Int {
     val grouped = entries
-        .filter { it.done }
         .groupBy { it.date.truncateToDay() }
+        .filterValues { tasks -> tasks.all { it.done } }
 
     if (grouped.isEmpty()) return 0
 
@@ -74,6 +74,7 @@ fun calculateCurrentStreak(entries: List<ChallengeEntry>): Int {
     return streak
 }
 
+//TODO: Сделать сохранение в БД User
 fun calculateMaxStreak(entries: List<ChallengeEntry>): Int {
     val grouped = entries.groupBy { it.date.truncateToDay() }
     val allDates = grouped.keys.sorted()
