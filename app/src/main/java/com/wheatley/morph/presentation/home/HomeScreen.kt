@@ -1,10 +1,15 @@
 package com.wheatley.morph.presentation.home
 
 import android.annotation.SuppressLint
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.anchoredDraggable
+import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,46 +20,67 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckBox
+import androidx.compose.material.icons.filled.CheckBoxOutlineBlank
 import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.outlined.ChevronRight
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxDefaults
+import androidx.compose.material3.SwipeToDismissBoxState
+import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.media3.common.util.UnstableApi
 import cafe.adriel.voyager.core.screen.Screen
@@ -66,10 +92,13 @@ import com.wheatley.morph.model.challenge.ChallengeScreenModel
 import com.wheatley.morph.model.challenge.ChallengeStatus
 import com.wheatley.morph.model.user.UserPrefs
 import com.wheatley.morph.presentation.ProfileTab
+import com.wheatley.morph.presentation.components.CalendarGrid
 import com.wheatley.morph.presentation.components.CardAction
 import com.wheatley.morph.presentation.components.CardBig
 import com.wheatley.morph.ui.theme.LocalExColorScheme
 import com.wheatley.morph.util.app.pluralDays
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
@@ -113,31 +142,15 @@ class HomeScreen: Screen {
             modifier = Modifier
                 .nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = {
-                TopAppBar(
+                CenterAlignedTopAppBar(
                     title = {
                         Text(
-                            text = "Привет, $userName",
+                            text = "Главная",
                             fontWeight = FontWeight.Bold,
-                            style = MaterialTheme.typography.headlineMedium
+                            style = MaterialTheme.typography.headlineSmall
                         )
                     },
                     scrollBehavior = scrollBehavior,
-                    actions = {
-                        IconButton(
-                            onClick = { tabNavigator.current = ProfileTab },
-                        ) {
-                            photoUri?.let {
-                                Image(
-                                    painter = rememberAsyncImagePainter(it),
-                                    contentDescription = null,
-                                    contentScale = ContentScale.Crop,
-                                    modifier = Modifier
-                                        .size(48.dp)
-                                        .clip(MaterialShapes.Cookie12Sided.toShape())
-                                )
-                            }
-                        }
-                    }
                 )
             },
             content = { innerPadding ->
@@ -152,32 +165,7 @@ class HomeScreen: Screen {
                     ) {
 
                         item {
-                            CardBig(
-                                modifier = Modifier.padding(bottom = 20.dp),
-                                color = LocalExColorScheme.current.lightPurple.colorContainer,
-                            ) {
-                                Column() {
-                                    Text(
-                                        text = "Дней подряд",
-                                        color = MaterialTheme.colorScheme.primary,
-                                        style = MaterialTheme.typography.titleMedium,
-                                        fontWeight = FontWeight.Bold,
-                                        modifier = Modifier.padding(bottom = 8.dp)
-                                    )
-                                    Text(
-                                        text = pluralDays(currentStreak),
-                                        style = MaterialTheme.typography.headlineMedium,
-                                        fontWeight = FontWeight.Bold,
-                                        color = MaterialTheme.colorScheme.primary,
-                                        modifier = Modifier.padding(bottom = 4.dp)
-                                    )
-                                    Text(
-                                        text = "Ваш текущий стрик",
-                                        style = MaterialTheme.typography.titleMedium,
-                                        //fontWeight = FontWeight.Bold
-                                    )
-                                }
-                            }
+                            SwipeToDismissListItems()
                         }
 
                         item {
@@ -206,12 +194,6 @@ class HomeScreen: Screen {
                                 action = { navigator?.push(ChallengesListScreen(screenModel, ChallengeStatus.IN_PROGRESS)) },
                             )
                         }
-                        item {
-                            CalendarGrid(
-                                onDateSelected = { selectedDate = it },
-                                onNavigateToCalendar = { date -> navigator?.push(ChallengesByDateScreen(screenModel, date)) }
-                            )
-                        }
                     }
                 }
             }
@@ -219,137 +201,42 @@ class HomeScreen: Screen {
     }
 }
 
-
 @Composable
-fun CalendarGrid(
-    onDateSelected: (LocalDate) -> Unit,
-    onNavigateToCalendar: (LocalDate) -> Unit
-) {
-    var currentMonth by remember { mutableStateOf(YearMonth.now()) }
-    val today = LocalDate.now()
+fun SwipeToDismissListItems() {
+    val scope = rememberCoroutineScope()
+    val dismissState = rememberSwipeToDismissBoxState(
+        initialValue = SwipeToDismissBoxValue.Settled,
+        positionalThreshold = SwipeToDismissBoxDefaults.positionalThreshold
+    )
 
-    val days by remember(currentMonth) {
-        derivedStateOf {
-            val firstDay = currentMonth.atDay(1)
-            val lastDay = currentMonth.atEndOfMonth()
-            val start = firstDay.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
-            val end = lastDay.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY))
-            (0..ChronoUnit.DAYS.between(start, end).toInt()).map { start.plusDays(it.toLong()) }
+    // Реагируем на изменение целевого значения — и сразу откатываем
+    LaunchedEffect(dismissState.targetValue) {
+        if (dismissState.targetValue != SwipeToDismissBoxValue.Settled) {
+            dismissState.snapTo(SwipeToDismissBoxValue.Settled)
         }
     }
 
-    val weekdays = remember {
-        DayOfWeek.entries
-            .sortedBy { it.value % 7 }
-            .map { it.getDisplayName(TextStyle.SHORT, Locale.forLanguageTag("ru")) }
-    }
 
-    CardBig {
-        Column {
-            MonthHeader(
-                currentMonth = currentMonth,
-                onPrevious = { currentMonth = currentMonth.minusMonths(1) },
-                onNext = { currentMonth = currentMonth.plusMonths(1) }
+    SwipeToDismissBox(
+        state = dismissState,
+        backgroundContent = {
+            val color by animateColorAsState(
+                when (dismissState.dismissDirection) {
+                    SwipeToDismissBoxValue.StartToEnd -> Color.Green
+                    SwipeToDismissBoxValue.EndToStart -> Color.Red
+                    else -> Color.LightGray
+                }, label = ""
             )
-
-            WeekdayHeader(weekdays)
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(7),
-                modifier = Modifier
-                    .animateContentSize()
-                    .fillMaxWidth()
-                    .heightIn(min = 200.dp, max = 300.dp),
-                userScrollEnabled = false
-            ) {
-                items(days) { date ->
-                    val isToday = date == today
-                    val isCurrentMonth = date.month == currentMonth.month
-                    val textColor = when {
-                        isToday -> MaterialTheme.colorScheme.onPrimary
-                        isCurrentMonth -> MaterialTheme.colorScheme.onSurface
-                        else -> MaterialTheme.colorScheme.outlineVariant
-                    }
-
-                    Box(
-                        modifier = Modifier
-                            .padding(4.dp)
-                            .size(36.dp)
-                            .aspectRatio(1f)
-                            .clip(CircleShape)
-                            .background(
-                                if (isToday)
-                                    Brush.verticalGradient(
-                                        listOf(
-                                            LocalExColorScheme.current.primary.secondColor,
-                                            LocalExColorScheme.current.primary.color
-                                        )
-                                    )
-                                else SolidColor(Color.Transparent)
-                            )
-                            .clickable {
-                                onDateSelected(date)
-                                onNavigateToCalendar(date)
-                            },
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = date.dayOfMonth.toString(),
-                            style = MaterialTheme.typography.labelLarge,
-                            color = textColor
-                        )
-                    }
-                }
-            }
+            Box(
+                Modifier
+                    .fillMaxSize()
+                    .background(color)
+            )
         }
-    }
-}
-
-@Composable
-private fun MonthHeader(
-    currentMonth: YearMonth,
-    onPrevious: () -> Unit,
-    onNext: () -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(bottom = 16.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
     ) {
-        IconButton(onClick = onPrevious) {
-            Icon(Icons.Default.ChevronLeft, contentDescription = "Предыдущий месяц")
-        }
-
-        Text(
-            text = "${currentMonth.month.getDisplayName(TextStyle.FULL_STANDALONE, Locale.forLanguageTag("ru")).replaceFirstChar { it.titlecase() }} ${currentMonth.year}",
-            style = MaterialTheme.typography.titleLarge
+        ListItem(
+            headlineContent = { Text("Cupcake") },
+            supportingContent = { Text("Swipe me left or right!") }
         )
-
-        IconButton(onClick = onNext) {
-            Icon(Icons.Default.ChevronRight, contentDescription = "Следующий месяц")
-        }
-    }
-}
-
-@Composable
-private fun WeekdayHeader(weekdays: List<String>) {
-    Row(
-        modifier = Modifier
-            .padding(horizontal = 16.dp)
-            .fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        weekdays.forEach {
-            Text(
-                text = it,
-                style = MaterialTheme.typography.labelLarge,
-                fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.primary
-            )
-        }
     }
 }
