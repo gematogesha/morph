@@ -26,13 +26,14 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.wheatley.morph.model.challenge.Challenge
 import com.wheatley.morph.model.challenge.ChallengeScreenModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 
 data class ChallengeDetailsScreen(
-    val challengeId: Long,
+    val challenge: Challenge,
 ): Screen {
 
     @Composable
@@ -42,16 +43,13 @@ data class ChallengeDetailsScreen(
         val snackbarHostState = remember { SnackbarHostState() }
         val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
-        val screenModel = koinScreenModel<ChallengeScreenModel>()
-        val challenge = screenModel.getChallenge(challengeId).collectAsStateWithLifecycle(null)
-
 
         Scaffold(
             modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = {
                 TopAppBar(
                     title = {
-                        Text("challenge" ?: "Достижение")
+                        Text("{${challenge.name}}")
                     },
                     navigationIcon = {
                         IconButton(onClick = { navigator.pop() }) {

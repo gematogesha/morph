@@ -34,6 +34,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.wheatley.morph.model.challenge.ChallengeScreenModel
 import com.wheatley.morph.model.challenge.ChallengeStatus
+import com.wheatley.morph.presentation.challenge.ChallengeDetailsScreen
 import com.wheatley.morph.presentation.components.ChallengeCard
 import com.wheatley.morph.util.app.color
 import java.util.Date
@@ -97,9 +98,11 @@ data class ChallengesListScreen(
 
                         val completedDays by screenModel.getCompletedDaysCount(challenge.id).collectAsState(initial = 0)
 
-                        Text("Выполнено $completedDays из ${challenge.duration}")
-
-                        ChallengeCard(challenge, completedDays)
+                        ChallengeCard(
+                            challenge = challenge,
+                            completedDays = completedDays,
+                            action = {navigator.push(ChallengeDetailsScreen(challenge))}
+                        )
 
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
