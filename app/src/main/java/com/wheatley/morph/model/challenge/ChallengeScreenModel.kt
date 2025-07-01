@@ -3,6 +3,7 @@ package com.wheatley.morph.model.challenge
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.wheatley.morph.model.challenge.repository.ChallengeRepository
+import com.wheatley.morph.util.system.date.truncateToDay
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -73,8 +74,8 @@ class ChallengeScreenModel(
     fun getChallengeStatusForDate(challengeId: Long, date: java.util.Date) =
         repository.getChallengeEntries(challengeId)
             .map { entries ->
-                val targetDay = date.toInstant().truncatedTo(java.time.temporal.ChronoUnit.DAYS)
-                entries.find { it.date.toInstant().truncatedTo(java.time.temporal.ChronoUnit.DAYS) == targetDay }?.done
+                val targetDay = date.truncateToDay()
+                entries.find { it.date.truncateToDay() == targetDay }?.done
             }
 
     fun addChallenge(challenge: Challenge) {
@@ -98,16 +99,6 @@ class ChallengeScreenModel(
     }
 
     fun deleteChallenge(challenge: Challenge) {
-        scope.launch {
-            try {
-                repository.deleteChallenge(challenge)
-            } catch (e: Exception) {
-                _error.update { e.message ?: "Failed to delete challenge" }
-            }
-        }
-    }
-
-    fun getCompletedDaysCount(challenge: Challenge) {
         scope.launch {
             try {
                 repository.deleteChallenge(challenge)
