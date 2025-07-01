@@ -3,6 +3,7 @@ package com.wheatley.morph.presentation.components
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,6 +21,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -29,6 +31,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.wheatley.morph.model.challenge.Challenge
@@ -154,8 +157,8 @@ fun CardBig(
 fun ChallengeCard(
     challenge: Challenge,
     completedDays: Int,
-    ) {
-
+    action: (() -> Unit)? = null,
+) {
     val animatedProgress by animateFloatAsState(
         targetValue = (completedDays.toFloat() / challenge.duration).coerceIn(0f, 1f),
         animationSpec = tween(300),
@@ -163,6 +166,12 @@ fun ChallengeCard(
     )
 
     CardBig(
+        modifier = Modifier
+            .clickable {
+                if (action != null) {
+                    action()
+                }
+            },
         color = challenge.color.colorContainer()
     ) {
         Column (
@@ -185,7 +194,17 @@ fun ChallengeCard(
                     color = MaterialTheme.colorScheme.outline
                 )
             }
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = "$completedDays/${challenge.duration}",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = challenge.color.color(),
+                textAlign = TextAlign.End
+
+            )
             LinearProgressIndicator(
+                modifier = Modifier.fillMaxWidth(),
                 progress = { animatedProgress },
                 color = challenge.color.color(),
                 trackColor = MaterialTheme.colorScheme.outlineVariant,
@@ -200,7 +219,7 @@ fun CardBadge(
     icon: String,
     colorTop: Color,
     colorBottom: Color
-){
+) {
     Box(
         modifier = modifier
             .height(48.dp)
