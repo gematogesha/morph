@@ -83,6 +83,8 @@ val yellow= Color(0xFFF6C344)
 val lightGreen= Color(0xFF99EC90)
 val green= Color(0xFF63B15D)
 val mint= Color(0xFF7CF2CD)
+val error = Color(0xFFF75555)
+val done = Color(0xFF12D18E)
 
 
 

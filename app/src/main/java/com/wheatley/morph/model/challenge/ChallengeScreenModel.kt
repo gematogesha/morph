@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.util.Date
 
 data class ChallengesState(
     val challenges: List<Challenge> = emptyList(),
@@ -38,16 +39,32 @@ class ChallengeScreenModel(
         repository.getAllChallenges(),
         repository.getAllEntries()
     ) { challenges, entries ->
+        val today = Date().truncateToDay()
+
         val inProgress = challenges.filter { it.status == ChallengeStatus.IN_PROGRESS }
         val completed = challenges.filter { it.status == ChallengeStatus.COMPLETED }
+
+        val completedToday = challenges.filter { challenge ->
+            val entriesForChallenge = entries.filter { it.challengeId == challenge.id }
+            entriesForChallenge.any { it.date.truncateToDay() == today && it.done }
+        }
+
+        val notCompletedToday = challenges.filter { challenge ->
+            challenge.status == ChallengeStatus.IN_PROGRESS &&
+                entries.any {
+                    it.challengeId == challenge.id &&
+                        it.date.truncateToDay() == today &&
+                        !it.done
+                }
+        }
 
         val currentStreak = calculateCurrentStreak(entries)
         val maxStreak = calculateMaxStreak(entries)
 
         ChallengesState(
             challenges = challenges,
-            inProgressChallenges = inProgress,
-            completedChallenges = completed,
+            inProgressChallenges = notCompletedToday,
+            completedChallenges = completedToday,
             currentStreak = currentStreak,
             maxStreak = maxStreak,
             isLoading = false,

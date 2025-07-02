@@ -96,7 +96,6 @@ class OnBoardingActivity() : ComponentActivity() {
                                 Navigator(OnBoardingGreetingScreen(screenModel)) { navigator ->
                                     SlideTransition(navigator)
                                 }
-
                             }
                         }
                     }

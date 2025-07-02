@@ -139,8 +139,6 @@ object SettingsTab : Tab {
 
     @Composable
     override fun Content() {
-        Navigator(SettingsScreen()) { navigator ->
-            SlideTransition(navigator)
-        }
+        Navigator(SettingsScreen())
     }
 }
