@@ -1,13 +1,13 @@
 package com.wheatley.morph.presentation.onboarding.model
 
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import androidx.compose.material3.SnackbarHostState
 import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
-import cafe.adriel.voyager.navigator.Navigator
 import com.wheatley.morph.model.user.UserPrefs
-import com.wheatley.morph.presentation.DashboardScreen
+import com.wheatley.morph.presentation.DashboardActivity
 import com.wheatley.morph.util.system.notification.SnackbarHelper
 import kotlinx.coroutines.launch
 
@@ -60,14 +60,11 @@ class OnBoardingScreenModel(
         }
     }
 
-    fun exit(navigator: Navigator) {
-        screenModelScope.launch {
-            try {
-                navigator.replaceAll(DashboardScreen())
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
+    fun exit() {
+        val intent = Intent(context, DashboardActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
+        context.startActivity(intent, null)
     }
 
     companion object {

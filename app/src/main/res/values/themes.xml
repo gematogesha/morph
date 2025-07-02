@@ -4,4 +4,10 @@
     <style name="Theme.Morph" parent="Theme.Material3.DayNight.NoActionBar">
     </style>
 
+    <style name="Theme.Morph.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/primary</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
+        <item name="postSplashScreenTheme">@style/Theme.Morph</item>
+    </style>
+
 </resources>

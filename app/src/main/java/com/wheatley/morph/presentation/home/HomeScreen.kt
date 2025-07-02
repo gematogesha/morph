@@ -52,6 +52,7 @@ import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxDefaults
 import androidx.compose.material3.SwipeToDismissBoxState
 import androidx.compose.material3.SwipeToDismissBoxValue
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -194,6 +195,16 @@ class HomeScreen: Screen {
                                 action = { navigator?.push(ChallengesListScreen(screenModel, ChallengeStatus.IN_PROGRESS)) },
                             )
                         }
+                        item {
+                            var checked by remember { mutableStateOf(true) }
+
+                            Switch(
+                                checked = checked,
+                                onCheckedChange = {
+                                    checked = it
+                                }
+                            )
+                        }
                     }
                 }
             }
@@ -203,18 +214,10 @@ class HomeScreen: Screen {
 
 @Composable
 fun SwipeToDismissListItems() {
-    val scope = rememberCoroutineScope()
     val dismissState = rememberSwipeToDismissBoxState(
         initialValue = SwipeToDismissBoxValue.Settled,
         positionalThreshold = SwipeToDismissBoxDefaults.positionalThreshold
     )
-
-    // Реагируем на изменение целевого значения — и сразу откатываем
-    LaunchedEffect(dismissState.targetValue) {
-        if (dismissState.targetValue != SwipeToDismissBoxValue.Settled) {
-            dismissState.snapTo(SwipeToDismissBoxValue.Settled)
-        }
-    }
 
 
     SwipeToDismissBox(

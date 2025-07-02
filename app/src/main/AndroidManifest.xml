@@ -34,15 +34,32 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
+        <!-- Main Activity -->
         <activity
             android:name=".presentation.MainActivity"
             android:exported="true"
-            android:theme="@style/Theme.Morph">
+            android:theme="@style/Theme.Morph.Splash"
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- Dashboard Activity -->
+        <activity
+            android:name=".presentation.DashboardActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Morph"
+            android:windowSoftInputMode="adjustResize"
+            android:launchMode="singleTop" />
+
+        <!-- Onboarding Activity -->
+        <activity
+            android:name=".presentation.onboarding.OnBoardingActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Morph"
+            android:windowSoftInputMode="adjustResize" />
     </application>
 
 </manifest>

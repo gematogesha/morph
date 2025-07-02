@@ -1,14 +1,16 @@
 package com.wheatley.morph.ui.theme
 import android.os.Build
+import androidx.activity.SystemBarStyle
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MotionScheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
@@ -232,14 +234,13 @@ val extendedDark = ExtendedColorScheme(
 
 val LocalExColorScheme = staticCompositionLocalOf { extendedLight }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun MorphTheme(
     dynamicColor: Boolean = false,
     content: @Composable() () -> Unit
 ) {
     val darkTheme = isDarkThemeEnabled()
-
-    ApplySystemUi()
 
     val colorScheme = when {
       dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
@@ -257,7 +258,8 @@ fun MorphTheme(
         MaterialTheme(
             colorScheme = colorScheme,
             typography = MorphTypography,
-            content = content
+            content = content,
+            motionScheme = MotionScheme.expressive()
         )
     }
 }
@@ -268,42 +270,5 @@ fun isDarkThemeEnabled(): Boolean {
         "light" -> false
         "dark" -> true
         else -> isSystemInDarkTheme()
-    }
-}
-
-@Composable
-fun ApplySystemUi() {
-    val systemUiController = rememberSystemUiController()
-    val navBarColor = MaterialTheme.colorScheme.surfaceContainer
-    val darkTheme = isDarkThemeEnabled()
-
-    DisposableEffect(systemUiController, darkTheme) {
-
-        systemUiController.setSystemBarsColor(
-            color = Color.Transparent,
-            darkIcons = !darkTheme
-        )
-
-        systemUiController.setNavigationBarColor(
-            color = navBarColor,
-        )
-
-        onDispose {}
-    }
-}
-
-@Composable
-fun ApplySystemUiRegister() {
-    val systemUiController = rememberSystemUiController()
-    val darkTheme = isDarkThemeEnabled()
-
-    DisposableEffect(systemUiController, darkTheme) {
-
-        systemUiController.setSystemBarsColor(
-            color = Color.Transparent,
-            darkIcons = !darkTheme
-        )
-
-        onDispose {}
     }
 }

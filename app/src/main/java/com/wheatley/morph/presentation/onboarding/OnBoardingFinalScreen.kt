@@ -16,8 +16,6 @@ class OnBoardingFinalScreen(
     @Composable
     override fun Content() {
 
-        val navigator = LocalNavigator.current
-
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -28,9 +26,7 @@ class OnBoardingFinalScreen(
             ) {
                 PrimaryButton(
                     onClick = {
-                        if (navigator != null) {
-                            screenModel.exit(navigator)
-                        }
+                        screenModel.exit()
                     },
                     text = "Завершить"
                 )
