@@ -19,6 +19,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
@@ -51,8 +52,8 @@ class OnBoardingActivity() : ComponentActivity() {
             MorphTheme {
                 val context = LocalContext.current
 
-                val navigator = LocalNavigator.currentOrThrow
-                val screenModel = navigator.rememberNavigatorScreenModel { OnBoardingScreenModel(context) }
+
+                val screenModel = remember { OnBoardingScreenModel(context) }
                 val state by screenModel.state.collectAsState()
 
                 val currentStep = state.step

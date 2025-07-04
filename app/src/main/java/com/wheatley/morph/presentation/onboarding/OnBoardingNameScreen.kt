@@ -22,6 +22,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import com.wheatley.morph.presentation.components.CustomTextField
 import com.wheatley.morph.presentation.components.PrimaryButton
 import com.wheatley.morph.presentation.onboarding.model.OnBoardingScreenModel
@@ -33,7 +34,7 @@ class OnBoardingNameScreen(
     @Composable
     override fun Content() {
 
-        val navigator = LocalNavigator.current
+        val navigator = LocalNavigator.currentOrThrow
         val state by screenModel.state.collectAsState()
 
         Box(

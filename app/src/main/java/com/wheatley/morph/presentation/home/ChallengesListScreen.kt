@@ -51,7 +51,7 @@ data class ChallengesListScreen(
     @SuppressLint("StateFlowValueCalledInComposition")
     @Composable
     override fun Content() {
-        val navigator = LocalNavigator.currentOrThrow
+        val navigator = LocalNavigator.current
         val state by screenModel.state.collectAsState()
 
         val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
@@ -71,14 +71,6 @@ data class ChallengesListScreen(
             topBar = {
                 TopAppBar(
                     title = { Text(label) },
-                    navigationIcon = {
-                        IconButton(onClick = { navigator.pop() }) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = "Назад"
-                            )
-                        }
-                    },
                     scrollBehavior = scrollBehavior,
                 )
             }
@@ -101,7 +93,6 @@ data class ChallengesListScreen(
                         ChallengeCard(
                             challenge = challenge,
                             completedDays = completedDays,
-                            action = {navigator.push(ChallengeDetailsScreen(challenge))}
                         )
 
                         Row(

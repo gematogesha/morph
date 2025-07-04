@@ -25,6 +25,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.font.FontWeight
@@ -34,6 +35,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.transitions.SlideTransition
 import com.wheatley.morph.model.challenge.ChallengeScreenModel
 import com.wheatley.morph.presentation.components.SwipeListItem
@@ -51,10 +53,8 @@ class HomeScreen: Screen {
     override fun Content() {
 
         val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
-        val navigatorState = remember { mutableStateOf<Screen>(WeeklyScreen()) }
-        val navigator = LocalNavigator.current
-
         val screenModel = koinScreenModel<ChallengeScreenModel>()
+        val selectedIndex = remember { mutableIntStateOf(0) }
 
         Scaffold(
             modifier = Modifier
@@ -75,6 +75,9 @@ class HomeScreen: Screen {
                 Surface(
                     modifier = Modifier.fillMaxSize()
                 ) {
+
+                    var childScreen by remember { mutableStateOf<Screen>(WeeklyScreen(innerPadding)) }
+
                     LazyColumn(
                         contentPadding = innerPadding,
                         modifier = Modifier
@@ -83,7 +86,6 @@ class HomeScreen: Screen {
                     ) {
                         item {
                             val options = listOf("Сегодня", "Неделя")
-                            val selectedIndex = remember { mutableIntStateOf(0) }
 
                             Row(
                                 modifier = Modifier.padding(bottom = 24.dp),
@@ -94,14 +96,11 @@ class HomeScreen: Screen {
                                         checked = selectedIndex.intValue == index,
                                         onCheckedChange = {
                                             selectedIndex.intValue = index
-                                            val screen = when (index) {
-                                                0 -> TodayScreen(
-                                                    screenModel = screenModel,
-                                                    innerPadding = innerPadding
-                                                )
-                                                else -> WeeklyScreen()
+                                            childScreen = if (index == 0) {
+                                                TodayScreen(screenModel, innerPadding)
+                                            } else {
+                                                WeeklyScreen(innerPadding)
                                             }
-                                            navigatorState.value = screen
                                         },
                                         modifier = Modifier.weight(1f),
                                         shapes = when (index) {
@@ -119,8 +118,7 @@ class HomeScreen: Screen {
                             }
                         }
                     }
-
-                    Navigator(WeeklyScreen()) { navigator ->
+                    Navigator(childScreen) { navigator ->
                         SlideTransition(navigator)
                     }
                 }
@@ -147,7 +145,6 @@ class TodayScreen(
                 .fillMaxSize()
                 .padding(horizontal = 24.dp)
         ) {
-
             items(state.inProgressChallenges, key = { it.id }) { challenge ->
                 SwipeListItem(
                     challenge = challenge,
@@ -169,11 +166,20 @@ class TodayScreen(
     }
 }
 
-class WeeklyScreen() : Screen {
+class WeeklyScreen(
+    val innerPadding: PaddingValues
+) : Screen {
     @Composable
     override fun Content() {
-        Box(){
-            Text("Test")
+        LazyColumn(
+            contentPadding = innerPadding,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 24.dp)
+        ) {
+            item {
+                Text("ssss")
+            }
         }
     }
 }
