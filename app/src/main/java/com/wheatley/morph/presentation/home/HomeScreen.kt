@@ -3,6 +3,7 @@ package com.wheatley.morph.presentation.home
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -54,7 +55,8 @@ class HomeScreen: Screen {
 
         val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
         val screenModel = koinScreenModel<ChallengeScreenModel>()
-        val selectedIndex = remember { mutableIntStateOf(0) }
+        var selectedIndex by remember { mutableIntStateOf(0) }
+        val state by screenModel.state.collectAsState()
 
         Scaffold(
             modifier = Modifier
@@ -75,52 +77,66 @@ class HomeScreen: Screen {
                 Surface(
                     modifier = Modifier.fillMaxSize()
                 ) {
+                    /*Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = 24.dp)
+                            .padding(innerPadding) // добавляем отступы от Scaffold
+                    ) {
+                        val options = listOf("Сегодня", "Неделя")
 
-                    var childScreen by remember { mutableStateOf<Screen>(WeeklyScreen(innerPadding)) }
-
+                        Row(
+                            modifier = Modifier.padding(bottom = 24.dp),
+                            horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween)
+                        ) {
+                            options.forEachIndexed { index, label ->
+                                ToggleButton(
+                                    checked = selectedIndex == index,
+                                    onCheckedChange = {
+                                        selectedIndex = index
+                                    },
+                                    modifier = Modifier.weight(1f),
+                                    shapes = when (index) {
+                                        0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
+                                        options.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
+                                        else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
+                                    }
+                                ) {
+                                    Text(
+                                        text = label,
+                                        style = MaterialTheme.typography.titleMedium,
+                                    )
+                                }
+                            }
+                        }
+                    }*/
                     LazyColumn(
                         contentPadding = innerPadding,
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(horizontal = 24.dp)
                     ) {
-                        item {
-                            val options = listOf("Сегодня", "Неделя")
-
-                            Row(
-                                modifier = Modifier.padding(bottom = 24.dp),
-                                horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween)
-                            ) {
-                                options.forEachIndexed { index, label ->
-                                    ToggleButton(
-                                        checked = selectedIndex.intValue == index,
-                                        onCheckedChange = {
-                                            selectedIndex.intValue = index
-                                            childScreen = if (index == 0) {
-                                                TodayScreen(screenModel, innerPadding)
-                                            } else {
-                                                WeeklyScreen(innerPadding)
-                                            }
-                                        },
-                                        modifier = Modifier.weight(1f),
-                                        shapes = when (index) {
-                                            0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
-                                            options.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
-                                            else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
-                                        }
-                                    ) {
-                                        Text(
-                                            text = label,
-                                            style = MaterialTheme.typography.titleMedium,
-                                        )
-                                    }
-                                }
-                            }
+                        items(state.inProgressChallenges, key = { "inProgress_${it.id}" }) { challenge ->
+                            SwipeListItem(
+                                challenge = challenge,
+                                onDone = { screenModel.toggleChallengeCompletion(challenge.id, Date(), true) },
+                                onRemove = {  },
+                            )
+                        }
+                        item{
+                            Text("Завершенные")
+                        }
+                        items(state.completedChallenges, key = { "completed_${it.id}" }) { challenge ->
+                            SwipeListItem(
+                                challenge = challenge,
+                                onDone = { screenModel.toggleChallengeCompletion(challenge.id, Date(), false) },
+                                onRemove = {  },
+                            )
                         }
                     }
-                    Navigator(childScreen) { navigator ->
+                    /*Navigator(TodayScreen(screenModel, innerPadding)) { navigator ->
                         SlideTransition(navigator)
-                    }
+                    }*/
                 }
             }
         )
@@ -145,7 +161,7 @@ class TodayScreen(
                 .fillMaxSize()
                 .padding(horizontal = 24.dp)
         ) {
-            items(state.inProgressChallenges, key = { it.id }) { challenge ->
+            items(state.inProgressChallenges, key = { "inProgress_${it.id}" }) { challenge ->
                 SwipeListItem(
                     challenge = challenge,
                     onDone = { screenModel.toggleChallengeCompletion(challenge.id, Date(), true) },
@@ -155,7 +171,7 @@ class TodayScreen(
             item{
                 Text("Завершенные")
             }
-            items(state.completedChallenges, key = { it.id }) { challenge ->
+            items(state.completedChallenges, key = { "completed_${it.id}" }) { challenge ->
                 SwipeListItem(
                     challenge = challenge,
                     onDone = { screenModel.toggleChallengeCompletion(challenge.id, Date(), false) },

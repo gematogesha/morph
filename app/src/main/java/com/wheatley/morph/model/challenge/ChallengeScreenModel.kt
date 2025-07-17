@@ -44,18 +44,18 @@ class ChallengeScreenModel(
         val inProgress = challenges.filter { it.status == ChallengeStatus.IN_PROGRESS }
         val completed = challenges.filter { it.status == ChallengeStatus.COMPLETED }
 
+        val entriesByChallengeId = entries.groupBy { it.challengeId }
+
         val completedToday = challenges.filter { challenge ->
-            val entriesForChallenge = entries.filter { it.challengeId == challenge.id }
+            val entriesForChallenge = entriesByChallengeId[challenge.id].orEmpty()
             entriesForChallenge.any { it.date.truncateToDay() == today && it.done }
         }
 
         val notCompletedToday = challenges.filter { challenge ->
             challenge.status == ChallengeStatus.IN_PROGRESS &&
-                entries.any {
-                    it.challengeId == challenge.id &&
-                        it.date.truncateToDay() == today &&
-                        !it.done
-                }
+                    entriesByChallengeId[challenge.id]
+                        .orEmpty()
+                        .any { it.date.truncateToDay() == today && !it.done }
         }
 
         val currentStreak = calculateCurrentStreak(entries)

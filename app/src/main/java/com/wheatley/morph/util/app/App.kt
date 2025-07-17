@@ -1,4 +1,4 @@
-package com.wheatley.morph.util.system
+package com.wheatley.morph.util.app
 
 import android.app.Application
 import com.wheatley.morph.di.initKoinModules
