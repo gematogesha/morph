@@ -65,39 +65,6 @@ class HomeScreen: Screen {
                 Surface(
                     modifier = Modifier.fillMaxSize()
                 ) {
-                    /*Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(horizontal = 24.dp)
-                            .padding(innerPadding) // добавляем отступы от Scaffold
-                    ) {
-                        val options = listOf("Сегодня", "Неделя")
-
-                        Row(
-                            modifier = Modifier.padding(bottom = 24.dp),
-                            horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween)
-                        ) {
-                            options.forEachIndexed { index, label ->
-                                ToggleButton(
-                                    checked = selectedIndex == index,
-                                    onCheckedChange = {
-                                        selectedIndex = index
-                                    },
-                                    modifier = Modifier.weight(1f),
-                                    shapes = when (index) {
-                                        0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
-                                        options.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
-                                        else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
-                                    }
-                                ) {
-                                    Text(
-                                        text = label,
-                                        style = MaterialTheme.typography.titleMedium,
-                                    )
-                                }
-                            }
-                        }
-                    }*/
                     LazyColumn(
                         contentPadding = innerPadding,
                         modifier = Modifier
@@ -122,9 +89,6 @@ class HomeScreen: Screen {
                             )
                         }
                     }
-                    /*Navigator(TodayScreen(screenModel, innerPadding)) { navigator ->
-                        SlideTransition(navigator)
-                    }*/
                 }
             }
         )
