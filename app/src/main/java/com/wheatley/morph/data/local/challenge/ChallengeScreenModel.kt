@@ -2,12 +2,11 @@ package com.wheatley.morph.data.local.challenge
 
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
+import com.wheatley.morph.core.date.truncateToDay
 import com.wheatley.morph.domain.model.Challenge
-import com.wheatley.morph.domain.model.ChallengeStatus
 import com.wheatley.morph.domain.model.calculateCurrentStreak
 import com.wheatley.morph.domain.model.calculateMaxStreak
 import com.wheatley.morph.domain.repository.ChallengeRepository
-import com.wheatley.morph.core.date.truncateToDay
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,6 +29,17 @@ data class ChallengesState(
     val maxStreak: Int = 0
 )
 
+enum class DailyChallengeStatus {
+    DONE,
+    MISSED,
+    NONE
+}
+
+data class ChallengeDisplayModel(
+    val challenge: Challenge,
+    val dailyStatus: DailyChallengeStatus
+)
+
 class ChallengeScreenModel(
     private val repository: ChallengeRepository
 ) : ScreenModel {
@@ -44,33 +54,27 @@ class ChallengeScreenModel(
         repository.getAllEntries()
     ) { challenges, entries ->
         val today = Date().truncateToDay()
-
-        val inProgress = challenges.filter { it.status == ChallengeStatus.IN_PROGRESS }
-        val completed = challenges.filter { it.status == ChallengeStatus.COMPLETED }
-
         val entriesByChallengeId = entries.groupBy { it.challengeId }
 
-        val completedToday = challenges.filter { challenge ->
+        val challengeModels = challenges.map { challenge ->
             val entriesForChallenge = entriesByChallengeId[challenge.id].orEmpty()
-            entriesForChallenge.any { it.date.truncateToDay() == today && it.done }
-        }
+            val entryToday = entriesForChallenge.find { it.date.truncateToDay() == today }
 
-        val notCompletedToday = challenges.filter { challenge ->
-            challenge.status == ChallengeStatus.IN_PROGRESS &&
-                    entriesByChallengeId[challenge.id]
-                        .orEmpty()
-                        .any { it.date.truncateToDay() == today && !it.done }
-        }
+            val status = when {
+                entryToday?.done == true -> DailyChallengeStatus.DONE
+                entryToday != null -> DailyChallengeStatus.MISSED
+                else -> DailyChallengeStatus.NONE
+            }
 
-        val currentStreak = calculateCurrentStreak(entries)
-        val maxStreak = calculateMaxStreak(entries)
+            ChallengeDisplayModel(challenge, status)
+        }
 
         ChallengesState(
             challenges = challenges,
-            inProgressChallenges = notCompletedToday,
-            completedChallenges = completedToday,
-            currentStreak = currentStreak,
-            maxStreak = maxStreak,
+            completedChallenges = challengeModels.filter { it.dailyStatus == DailyChallengeStatus.DONE }.map { it.challenge },
+            inProgressChallenges = challengeModels.filter { it.dailyStatus != DailyChallengeStatus.DONE }.map { it.challenge },
+            currentStreak = calculateCurrentStreak(entries),
+            maxStreak = calculateMaxStreak(entries),
             isLoading = false,
             error = null
         )

@@ -41,22 +41,6 @@ class ChallengeRepositoryImpl(
 
     override suspend fun deleteChallenge(challenge: Challenge) = dao.deleteChallengeAndEntries(challenge)
 
-    private suspend fun updateChallengeStatus(challengeId: Long) {
-        val challenge = dao.getChallengeById(challengeId).firstOrNull() ?: return
-        val entries = dao.getChallengeEntries(challengeId)
-        val completedCount = entries.count { it.done }
-
-        val newStatus = if (completedCount >= challenge.duration) {
-            ChallengeStatus.COMPLETED
-        } else {
-            ChallengeStatus.IN_PROGRESS
-        }
-
-        if (newStatus != challenge.status) {
-            dao.updateChallenge(challenge.copy(status = newStatus))
-        }
-    }
-
     override suspend fun toggleChallengeCompletion(
         challengeId: Long,
         date: Date,
@@ -67,8 +51,14 @@ class ChallengeRepositoryImpl(
         val entries = dao.getChallengeEntries(challengeId)
         val existing = entries.find { it.date.truncateToDay() == dayDate }
 
-        if (existing != null && existing.done == completed) {
-            return
+        if (existing != null) {
+            dao.upsertEntry(
+                existing.copy(done = completed)
+            )
+        } else {
+            dao.upsertEntry(
+                ChallengeEntry(challengeId = challengeId, date = dayDate, done = completed)
+            )
         }
 
         dao.upsertEntry(
@@ -78,8 +68,6 @@ class ChallengeRepositoryImpl(
                 done = completed
             )
         )
-
-        updateChallengeStatus(challengeId)
     }
 
     override suspend fun getCurrentStreak(): Int {
