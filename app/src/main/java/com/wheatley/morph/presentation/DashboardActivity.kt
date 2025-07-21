@@ -39,8 +39,7 @@ import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabNavigator
 import com.wheatley.morph.presentation.components.UpdateScreen
 import com.wheatley.morph.ui.theme.MorphTheme
-import com.wheatley.morph.util.ui.ThemeManager
-import com.wheatley.morph.util.update.UpdateChecker
+import com.wheatley.morph.ui.theme.ThemeManager
 import kotlinx.coroutines.launch
 
 //TODO: Реализовать ViewModel ВО ВСЕХ Screen с .launch
@@ -68,23 +67,6 @@ class DashboardActivity() : ComponentActivity() {
                 val snackbarHostState = remember { SnackbarHostState() }
 
                 val tabs = listOf(HomeTab, StatisticsTab, ChallengeAddTab, ProfileTab, SettingsTab)
-
-                LaunchedEffect(Unit) {
-                    scope.launch {
-                        UpdateChecker(context).checkVersion(
-                            snackbarHostState = snackbarHostState,
-                            onNewUpdate = { version, changelog, link ->
-                                updateVersion = version
-                                updateChangelog = changelog
-                                updateDownload = link
-                                showSheet = true
-
-
-                            },
-                            onFinish = { /* optional */ }
-                        )
-                    }
-                }
 
                 if (showSheet) {
                     UpdateScreen(

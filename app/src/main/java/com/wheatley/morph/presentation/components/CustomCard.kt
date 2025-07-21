@@ -21,7 +21,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -34,10 +33,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.wheatley.morph.model.challenge.Challenge
-import com.wheatley.morph.util.app.color
-import com.wheatley.morph.util.app.colorContainer
-import com.wheatley.morph.util.app.secondColor
+import com.wheatley.morph.domain.model.Challenge
+import com.wheatley.morph.core.app.color
+import com.wheatley.morph.core.app.colorContainer
+import com.wheatley.morph.core.app.secondColor
 
 @Composable
 fun CardSmall(

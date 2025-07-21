@@ -2,13 +2,13 @@ package com.wheatley.morph.di
 
 import android.content.Context
 import androidx.room.Room
-import com.wheatley.morph.model.challenge.AppDatabase
-import com.wheatley.morph.model.challenge.ChallengeDao
-import com.wheatley.morph.model.challenge.ChallengeScreenModel
-import com.wheatley.morph.model.challenge.repository.ChallengeRepository
-import com.wheatley.morph.model.challenge.repository.ChallengeRepositoryImpl
-import com.wheatley.morph.presentation.add.model.ChallengeAddScreenModel
-import com.wheatley.morph.presentation.onboarding.model.OnBoardingScreenModel
+import com.wheatley.morph.data.local.challenge.AppDatabase
+import com.wheatley.morph.data.local.challenge.ChallengeDao
+import com.wheatley.morph.data.local.challenge.ChallengeScreenModel
+import com.wheatley.morph.domain.repository.ChallengeRepository
+import com.wheatley.morph.data.repository.ChallengeRepositoryImpl
+import com.wheatley.morph.presentation.add.ChallengeAddScreenModel
+import com.wheatley.morph.presentation.onboarding.OnBoardingScreenModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 import org.koin.core.module.dsl.singleOf
@@ -20,7 +20,7 @@ object DiModules {
             context,
             AppDatabase::class.java,
             //TODO: Изменить имя DB
-            "challenge-db"
+            "morph-db"
         )
             .fallbackToDestructiveMigration(false)
             .build()

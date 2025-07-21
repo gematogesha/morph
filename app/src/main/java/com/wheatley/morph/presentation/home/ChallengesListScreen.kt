@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -31,12 +30,10 @@ import androidx.compose.ui.unit.dp
 import androidx.media3.common.util.UnstableApi
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.currentOrThrow
-import com.wheatley.morph.model.challenge.ChallengeScreenModel
-import com.wheatley.morph.model.challenge.ChallengeStatus
-import com.wheatley.morph.presentation.challenge.ChallengeDetailsScreen
+import com.wheatley.morph.data.local.challenge.ChallengeScreenModel
+import com.wheatley.morph.domain.model.ChallengeStatus
 import com.wheatley.morph.presentation.components.ChallengeCard
-import com.wheatley.morph.util.app.color
+import com.wheatley.morph.core.app.color
 import java.util.Date
 
 @androidx.annotation.OptIn(UnstableApi::class)

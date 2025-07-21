@@ -1,0 +1,28 @@
+package com.wheatley.morph.presentation.settings.about
+
+import android.content.Context
+import androidx.compose.material3.SnackbarHostState
+import cafe.adriel.voyager.core.model.StateScreenModel
+
+data class AboutScreenState(
+    val isLoading: Boolean = false,
+    val showSheet: Boolean = false,
+    val version: String = "",
+    val changelog: String = "",
+    val downloadLink: String = ""
+)
+
+class AboutScreenModel(
+    private val context: Context
+) : StateScreenModel<AboutScreenState>(AboutScreenState()) {
+
+    fun checkForUpdate(snackbarHostState: SnackbarHostState) {
+        //mutableState.value = mutableState.value.copy(isLoading = true)
+        mutableState.value = mutableState.value.copy(isLoading = false)
+
+    }
+
+    fun dismissSheet() {
+        mutableState.value = mutableState.value.copy(showSheet = false)
+    }
+}

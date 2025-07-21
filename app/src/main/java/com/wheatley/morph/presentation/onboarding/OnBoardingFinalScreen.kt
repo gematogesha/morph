@@ -6,9 +6,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.navigator.LocalNavigator
 import com.wheatley.morph.presentation.components.PrimaryButton
-import com.wheatley.morph.presentation.onboarding.model.OnBoardingScreenModel
 
 class OnBoardingFinalScreen(
     private val screenModel: OnBoardingScreenModel

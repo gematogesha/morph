@@ -27,10 +27,12 @@ import androidx.compose.ui.unit.dp
 import androidx.media3.common.util.UnstableApi
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.currentOrThrow
 import com.wheatley.morph.presentation.components.SettingsItem
-import com.wheatley.morph.util.app.AppInfo.getAppName
-import com.wheatley.morph.util.app.AppInfo.getVersionName
+import com.wheatley.morph.core.app.AppInfo.getAppName
+import com.wheatley.morph.core.app.AppInfo.getVersionName
+import com.wheatley.morph.presentation.settings.about.AboutScreen
+import com.wheatley.morph.presentation.settings.appearance.AppearanceScreen
+import com.wheatley.morph.presentation.settings.notifications.NotificationsScreen
 
 data class MenuItem(
     val title: String,

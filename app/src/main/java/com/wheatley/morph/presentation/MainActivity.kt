@@ -17,10 +17,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import com.wheatley.morph.model.user.UserPrefs
+import com.wheatley.morph.data.local.prefs.User
 import com.wheatley.morph.presentation.onboarding.OnBoardingActivity
 import com.wheatley.morph.ui.theme.MorphTheme
-import com.wheatley.morph.util.ui.ThemeManager
+import com.wheatley.morph.ui.theme.ThemeManager
 import kotlinx.coroutines.delay
 
 class MainActivity : ComponentActivity() {
@@ -61,7 +61,7 @@ class MainActivity : ComponentActivity() {
     private suspend fun checkRegistrationAndNavigate() {
         delay(1000)
 
-        val isRegistered = UserPrefs.isRegistered(applicationContext)
+        val isRegistered = User.isRegistered(applicationContext)
         val targetActivity = if (isRegistered) DashboardActivity::class.java else OnBoardingActivity::class.java
 
         startActivity(Intent(this, targetActivity))

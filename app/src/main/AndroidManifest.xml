@@ -12,7 +12,7 @@
         android:maxSdkVersion="32" />
 
     <application
-        android:name=".util.app.App"
+        android:name=".core.app.App"
         android:enableOnBackInvokedCallback="true"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"

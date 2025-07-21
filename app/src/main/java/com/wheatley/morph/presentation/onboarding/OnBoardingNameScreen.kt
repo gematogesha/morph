@@ -25,7 +25,6 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.wheatley.morph.presentation.components.CustomTextField
 import com.wheatley.morph.presentation.components.PrimaryButton
-import com.wheatley.morph.presentation.onboarding.model.OnBoardingScreenModel
 
 class OnBoardingNameScreen(
     private val screenModel: OnBoardingScreenModel

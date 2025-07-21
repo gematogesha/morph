@@ -68,12 +68,11 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.koinScreenModel
 import com.wheatley.morph.R
-import com.wheatley.morph.model.challenge.ChallengeColor
-import com.wheatley.morph.presentation.add.model.ChallengeAddScreenModel
+import com.wheatley.morph.domain.model.ChallengeColor
 import com.wheatley.morph.presentation.components.CustomTextField
 import com.wheatley.morph.ui.theme.ColorFamily
 import com.wheatley.morph.ui.theme.LocalExColorScheme
-import com.wheatley.morph.util.app.pluralDays
+import com.wheatley.morph.core.app.pluralDays
 import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")

@@ -23,7 +23,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.wheatley.morph.util.update.UpdateDownloader
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -84,11 +83,6 @@ fun UpdateScreen(
                     }
 
                     Button(onClick = {
-                        UpdateDownloader.start(
-                            context = context,
-                            url = downloadLink,
-                            title = "Morph $versionName"
-                        )
                         onDismiss()
                     }) {
                         Text("Обновить")

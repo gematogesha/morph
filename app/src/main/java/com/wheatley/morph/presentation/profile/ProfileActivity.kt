@@ -30,7 +30,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import coil.compose.rememberAsyncImagePainter
-import com.wheatley.morph.model.user.UserPrefs
+import com.wheatley.morph.data.local.prefs.User
 
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
@@ -41,8 +41,8 @@ class ProfileScreen: Screen {
         val context = LocalContext.current
         val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
-        val userName by UserPrefs.getUserNameFlow(context).collectAsState(initial = "")
-        val photoUri by UserPrefs.getUserPhotoFlow(context).collectAsState(initial = null)
+        val userName by User.getUserNameFlow(context).collectAsState(initial = "")
+        val photoUri by User.getUserPhotoFlow(context).collectAsState(initial = null)
 
 
         Scaffold(

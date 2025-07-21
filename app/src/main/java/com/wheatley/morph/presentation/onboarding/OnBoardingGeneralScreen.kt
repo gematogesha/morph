@@ -30,7 +30,6 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import coil.compose.rememberAsyncImagePainter
 import com.wheatley.morph.presentation.components.PrimaryButton
-import com.wheatley.morph.presentation.onboarding.model.OnBoardingScreenModel
 
 class OnBoardingGeneralScreen(
     private val screenModel: OnBoardingScreenModel
