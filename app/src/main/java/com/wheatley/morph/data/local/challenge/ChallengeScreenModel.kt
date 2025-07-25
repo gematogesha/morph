@@ -84,7 +84,7 @@ class ChallengeScreenModel(
         ChallengesState(isLoading = true)
     )
 
-    fun toggleChallengeCompletion(challengeId: Long, date: java.util.Date, completed: Boolean) {
+    fun toggleChallengeCompletion(challengeId: Long, date: Date, completed: Boolean) {
         scope.launch {
             try {
                 repository.toggleChallengeCompletion(challengeId, date, completed)
@@ -96,7 +96,7 @@ class ChallengeScreenModel(
 
     fun getChallenge(challengeId: Long) = repository.getChallengeById(challengeId)
 
-    fun getChallengeStatusForDate(challengeId: Long, date: java.util.Date) =
+    fun getChallengeStatusForDate(challengeId: Long, date: Date) =
         repository.getChallengeEntries(challengeId)
             .map { entries ->
                 val targetDay = date.truncateToDay()
