@@ -128,7 +128,11 @@ class AboutScreen : Screen {
                         changelogInfo = state.changelog,
                         showSheet = state.showSheet,
                         onDismiss = { model.dismissSheet() },
-                        onInstallClick = { model.checkUpdate(snackbarHostState, updateManager) }
+                        onInstallClick = {
+                            state.updateInfo?.let { update ->
+                                updateManager.downloadAndInstall(update)
+                            }
+                        }
                     )
                 }
             }

@@ -90,8 +90,12 @@ fun UpdateScreen(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterHorizontally)
                     ) {
-                        CustomTextButton(onClick = onDismiss, text = "Позже")
-                        PrimaryButton(onClick = onInstallClick, text = "Установить")
+                        CustomTextButton(onClick = { onDismiss() }, text = "Позже")
+                        PrimaryButton(
+                            onClick = {
+                                onInstallClick()
+                                onDismiss()
+                            }, text = "Установить")
                     }
                 }
             }

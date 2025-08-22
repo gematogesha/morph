@@ -13,7 +13,8 @@ data class AboutScreenState(
     val showSheet: Boolean = false,
     val version: String = "",
     val changelog: String = "",
-    val downloadLink: String = ""
+    val downloadLink: String = "",
+    val updateInfo: UpdateInfo? = null
 )
 
 class AboutScreenModel : StateScreenModel<AboutScreenState>(AboutScreenState()) {
@@ -28,7 +29,8 @@ class AboutScreenModel : StateScreenModel<AboutScreenState>(AboutScreenState()) 
                     showSheet = true,
                     version = update.version,
                     downloadLink = update.apkUrl,
-                    changelog = update.changelog
+                    changelog = update.changelog,
+                    updateInfo = update
                 )
             },
             onNoUpdate = {
