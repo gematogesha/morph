@@ -21,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
@@ -40,7 +41,12 @@ class OnBoardingGeneralScreen(
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val state by screenModel.state.collectAsState()
+
+        //TODO: Добавить обработку событий (SnackBar)
+
         val snackbarHostState = remember { SnackbarHostState() }
+        val scope = rememberCoroutineScope()
+
 
         Column(
             modifier = Modifier
@@ -75,10 +81,10 @@ class OnBoardingGeneralScreen(
                     screenModel.previousStep()
                 },
                 onNext = {
-                    screenModel.save(snackbarHostState) {
-                        navigator.push(OnBoardingFinalScreen(screenModel))
-                        screenModel.nextStep()
-                    }
+                    screenModel.save()
+                    navigator.push(OnBoardingFinalScreen(screenModel))
+                    screenModel.nextStep()
+
                 },
                 nextEnabled = screenModel.isImageValid && screenModel.isNameValid
             )

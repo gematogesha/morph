@@ -4,35 +4,33 @@ import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.wheatley.morph.core.date.truncateToDay
 import com.wheatley.morph.domain.model.Challenge
+import com.wheatley.morph.domain.model.ChallengeEntry
 import com.wheatley.morph.domain.model.calculateCurrentStreak
 import com.wheatley.morph.domain.model.calculateMaxStreak
 import com.wheatley.morph.domain.repository.ChallengeRepository
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.util.Date
 
+// ---------- UI STATE ----------
+
 data class ChallengesState(
-    val challenges: List<Challenge> = emptyList(),
-    val inProgressChallenges: List<Challenge> = emptyList(),
-    val completedChallenges: List<Challenge> = emptyList(),
+    val challenges: List<ChallengeDisplayModel> = emptyList(),
     val isLoading: Boolean = false,
     val error: String? = null,
     val currentStreak: Int = 0,
     val maxStreak: Int = 0
-)
+) {
+    val inProgressChallenges: List<Challenge>
+        get() = challenges.filter { it.dailyStatus != DailyChallengeStatus.DONE }.map { it.challenge }
+
+    val completedChallenges: List<Challenge>
+        get() = challenges.filter { it.dailyStatus == DailyChallengeStatus.DONE }.map { it.challenge }
+}
 
 enum class DailyChallengeStatus {
-    DONE,
-    MISSED,
-    NONE
+    DONE, MISSED, NONE
 }
 
 data class ChallengeDisplayModel(
@@ -40,19 +38,38 @@ data class ChallengeDisplayModel(
     val dailyStatus: DailyChallengeStatus
 )
 
+// ---------- ONE-TIME EVENTS ----------
+
+sealed interface ChallengeEvent {
+    data class ShowMessage(val message: String) : ChallengeEvent
+    data object InDev : ChallengeEvent
+}
+
+// ---------- SCREEN MODEL ----------
+
 class ChallengeScreenModel(
     private val repository: ChallengeRepository
 ) : ScreenModel {
 
-    private val scope: CoroutineScope = screenModelScope
+    private val scope = screenModelScope
 
-    private val _error = MutableStateFlow<String?>(null)
-    val error: StateFlow<String?> = _error.asStateFlow()
+    private val _events = MutableSharedFlow<ChallengeEvent>()
+    val events: SharedFlow<ChallengeEvent> = _events.asSharedFlow()
 
     val state: StateFlow<ChallengesState> = combine(
         repository.getAllChallenges(),
-        repository.getAllEntries()
-    ) { challenges, entries ->
+        repository.getAllEntries(),
+        ::mapChallengesToState
+    ).stateIn(
+        scope,
+        SharingStarted.WhileSubscribed(5000),
+        ChallengesState(isLoading = true)
+    )
+
+    private fun mapChallengesToState(
+        challenges: List<Challenge>,
+        entries: List<ChallengeEntry> // заменишь на свою модель
+    ): ChallengesState {
         val today = Date().truncateToDay()
         val entriesByChallengeId = entries.groupBy { it.challengeId }
 
@@ -69,34 +86,29 @@ class ChallengeScreenModel(
             ChallengeDisplayModel(challenge, status)
         }
 
-        ChallengesState(
-            challenges = challenges,
-            completedChallenges = challengeModels.filter { it.dailyStatus == DailyChallengeStatus.DONE }.map { it.challenge },
-            inProgressChallenges = challengeModels.filter { it.dailyStatus != DailyChallengeStatus.DONE }.map { it.challenge },
+        return ChallengesState(
+            challenges = challengeModels,
             currentStreak = calculateCurrentStreak(entries),
             maxStreak = calculateMaxStreak(entries),
-            isLoading = false,
-            error = null
+            isLoading = false
         )
-    }.stateIn(
-        scope,
-        kotlinx.coroutines.flow.SharingStarted.WhileSubscribed(5000),
-        ChallengesState(isLoading = true)
-    )
+    }
+
+    // ---------- REPOSITORY WRAPPERS ----------
 
     fun toggleChallengeCompletion(challengeId: Long, date: Date, completed: Boolean) {
         scope.launch {
-            try {
+            runCatching {
                 repository.toggleChallengeCompletion(challengeId, date, completed)
-            } catch (e: Exception) {
-                _error.update { e.message ?: "Failed to toggle completion" }
+            }.onFailure {
+                _events.emit(ChallengeEvent.ShowMessage(it.message ?: "Failed to toggle completion"))
             }
         }
     }
 
     fun getChallenge(challengeId: Long) = repository.getChallengeById(challengeId)
 
-    fun getChallengeStatusForDate(challengeId: Long, date: Date) =
+    fun getChallengeStatusForDate(challengeId: Long, date: Date): Flow<Boolean?> =
         repository.getChallengeEntries(challengeId)
             .map { entries ->
                 val targetDay = date.truncateToDay()
@@ -105,36 +117,29 @@ class ChallengeScreenModel(
 
     fun addChallenge(challenge: Challenge) {
         scope.launch {
-            try {
-                repository.addChallenge(challenge)
-            } catch (e: Exception) {
-                _error.update { e.message ?: "Failed to add challenge" }
-            }
+            runCatching { repository.addChallenge(challenge) }
+                .onFailure { _events.emit(ChallengeEvent.ShowMessage(it.message ?: "Failed to add challenge")) }
         }
     }
 
     fun updateChallenge(challenge: Challenge) {
         scope.launch {
-            try {
-                repository.updateChallenge(challenge)
-            } catch (e: Exception) {
-                _error.update { e.message ?: "Failed to update challenge" }
-            }
+            runCatching { repository.updateChallenge(challenge) }
+                .onFailure { _events.emit(ChallengeEvent.ShowMessage(it.message ?: "Failed to update challenge")) }
         }
     }
 
     fun deleteChallenge(challenge: Challenge) {
         scope.launch {
-            try {
-                repository.deleteChallenge(challenge)
-            } catch (e: Exception) {
-                _error.update { e.message ?: "Failed to delete challenge" }
-            }
+            runCatching { repository.deleteChallenge(challenge) }
+                .onFailure { _events.emit(ChallengeEvent.ShowMessage(it.message ?: "Failed to delete challenge")) }
         }
     }
 
-    fun getCompletedDaysCount(challengeId: Long): Flow<Int> {
-        return repository.getCompletedDaysCount(challengeId)
-    }
+    fun getCompletedDaysCount(challengeId: Long): Flow<Int> =
+        repository.getCompletedDaysCount(challengeId)
 
+    fun inDev() {
+        scope.launch { _events.emit(ChallengeEvent.InDev) }
+    }
 }

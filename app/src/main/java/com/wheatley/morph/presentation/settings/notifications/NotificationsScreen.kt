@@ -62,9 +62,7 @@ class NotificationsScreen: Screen {
                 )
             },
             snackbarHost = {
-                SnackbarHost(hostState = snackbarHostState) { data ->
-                    Snackbar(snackbarData = data)
-                }
+                SnackbarHost(hostState = snackbarHostState)
             },
         ) { innerPadding ->
             Surface(

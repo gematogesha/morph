@@ -73,18 +73,21 @@ import com.wheatley.morph.presentation.components.CustomTextField
 import com.wheatley.morph.ui.theme.ColorFamily
 import com.wheatley.morph.ui.theme.LocalExColorScheme
 import com.wheatley.morph.core.app.pluralDays
+import com.wheatley.morph.data.local.helpers.SnackbarHelper
 import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
-class ChallengeAddScreen : Screen {
+class AddChallengeScreen : Screen {
     @Composable
     override fun Content() {
-        val screenModel = koinScreenModel<ChallengeAddScreenModel>()
+        val screenModel = koinScreenModel<AddChallengeScreenModel>()
         val state by screenModel.state.collectAsState()
 
         val snackbarHostState = remember { SnackbarHostState() }
         val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+
+        val scope = rememberCoroutineScope()
 
         fun filterSingleEmoji(input: String): String {
             val regex = Regex("""\X""")
@@ -121,7 +124,15 @@ class ChallengeAddScreen : Screen {
         var currentDay by remember { mutableIntStateOf(0) }
         var showDurationField by remember { mutableStateOf(false) }
 
-        // Reset после успешного добавления
+
+        LaunchedEffect(screenModel) {
+            screenModel.events.collect { event ->
+                when (event) {
+                    is AddChallengeEvent.ShowMessage -> SnackbarHelper.show(scope, snackbarHostState, event.message)
+                }
+            }
+        }
+
         LaunchedEffect(state.resetTrigger) {
             if (state.resetTrigger) {
                 currentDay = 0
@@ -137,7 +148,7 @@ class ChallengeAddScreen : Screen {
                     title = { Text("Добавить достижение") },
                     actions = {
                         IconButton(onClick = {
-                            screenModel.save(snackbarHostState)
+                            screenModel.save()
                         }) {
                             Icon(Icons.Default.Save, contentDescription = "Save")
                         }
@@ -146,7 +157,7 @@ class ChallengeAddScreen : Screen {
                 )
             },
             snackbarHost = {
-                SnackbarHost(hostState = snackbarHostState) { Snackbar(snackbarData = it) }
+                SnackbarHost(hostState = snackbarHostState)
             }
         ) { innerPadding ->
             Surface(Modifier.fillMaxSize()) {

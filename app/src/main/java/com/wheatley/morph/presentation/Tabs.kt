@@ -9,11 +9,13 @@ import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import cafe.adriel.voyager.core.annotation.ExperimentalVoyagerApi
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
-import cafe.adriel.voyager.transitions.SlideTransition
-import com.wheatley.morph.presentation.add.ChallengeAddScreen
+import cafe.adriel.voyager.transitions.ScreenTransition
+import com.wheatley.morph.data.local.voyager.CustomSlideTransition
+import com.wheatley.morph.presentation.add.AddChallengeScreen
 import com.wheatley.morph.presentation.home.HomeScreen
 import com.wheatley.morph.presentation.profile.ProfileScreen
 import com.wheatley.morph.presentation.settings.SettingsScreen
@@ -38,9 +40,7 @@ object HomeTab : Tab {
 
     @Composable
     override fun Content() {
-        Navigator(HomeScreen()) { navigator ->
-            SlideTransition(navigator)
-        }
+        Navigator(HomeScreen())
     }
 }
 
@@ -89,7 +89,7 @@ object ChallengeAddTab : Tab {
 
     @Composable
     override fun Content() {
-        Navigator(ChallengeAddScreen())
+        Navigator(AddChallengeScreen())
     }
 }
 
@@ -137,8 +137,14 @@ object SettingsTab : Tab {
         }
 
 
+    @OptIn(ExperimentalVoyagerApi::class)
     @Composable
     override fun Content() {
-        Navigator(SettingsScreen())
+        Navigator(SettingsScreen()) { navigator ->
+            ScreenTransition(
+                navigator = navigator,
+                defaultTransition = CustomSlideTransition()
+            )
+        }
     }
 }

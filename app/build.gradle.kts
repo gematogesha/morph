@@ -124,4 +124,28 @@ dependencies {
     // Debug Tools
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    //Markdown
+    implementation("io.noties.markwon:core:4.6.2") {
+        exclude(group = "org.jetbrains", module = "annotations-java5")
+    }
+    implementation("io.noties.markwon:ext-tables:4.6.2") {
+        exclude(group = "org.jetbrains", module = "annotations-java5")
+    }
+    implementation("io.noties.markwon:html:4.6.2") {
+        exclude(group = "org.jetbrains", module = "annotations-java5")
+    }
+    implementation("io.noties.markwon:linkify:4.6.2") {
+        exclude(group = "org.jetbrains", module = "annotations-java5")
+    }
+    implementation("io.noties.markwon:image-coil:4.6.2") {
+        exclude(group = "org.jetbrains", module = "annotations-java5")
+    }
+    implementation("io.noties.markwon:syntax-highlight:4.6.2") {
+        exclude(group = "org.jetbrains", module = "annotations-java5")
+    }
+
+
+    implementation("org.jetbrains:annotations:26.0.2")
+
 }

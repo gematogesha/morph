@@ -1,13 +1,15 @@
 package com.wheatley.morph.presentation.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material3.Card
@@ -27,15 +29,18 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.wheatley.morph.core.app.color
 import com.wheatley.morph.domain.model.Challenge
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SwipeListItem(
+fun SwipeListChallenge(
     modifier: Modifier = Modifier,
     challenge: Challenge,
-    onDone: (() -> Unit),
-    onRemove: (() -> Unit),
+    onDone: () -> Unit,
+    onRemove: () -> Unit,
+    isDone: Boolean,
 ) {
     val swipeState = rememberSwipeToDismissBoxState()
 
@@ -58,22 +63,24 @@ fun SwipeListItem(
 
         SwipeToDismissBoxValue.Settled -> {
             icon = Icons.Rounded.Delete
-            alignment = Alignment.CenterEnd
-            color = MaterialTheme.colorScheme.errorContainer
+            alignment = Alignment.Center
+            color = Color.Transparent
         }
     }
 
     SwipeToDismissBox(
         state = swipeState,
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier
+            .fillMaxSize()
+            .padding(bottom = 16.dp),
         backgroundContent = {
             Box(
                 Modifier
                     .fillMaxSize()
+                    .clip(MaterialTheme.shapes.small)
                     .background(color)
                     .wrapContentSize(alignment)
-                    .padding(start = 16.dp)
-                    .clip(MaterialTheme.shapes.small)
+                    .padding(16.dp)
             ) {
                 Icon(
                     imageVector = icon,
@@ -87,17 +94,50 @@ fun SwipeListItem(
             modifier = Modifier.fillMaxWidth(),
             shape = MaterialTheme.shapes.small,
             colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surface
+                containerColor = challenge.color.color()
             )
         ) {
             Box(
                 modifier = Modifier.padding(16.dp),
                 contentAlignment = Alignment.CenterStart
             ) {
-                Text(
-                    text = challenge.name,
-                    style = MaterialTheme.typography.bodyLarge
-                )
+                Row (
+                    modifier = Modifier.fillMaxSize(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Text(
+                            text = challenge.emoji,
+                            fontSize = 32.sp
+                        )
+                        Text(
+                            text = challenge.name,
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                    }
+                    if (isDone) {
+                        Row(
+                            modifier = Modifier
+                                .size(28.dp)
+                                .clip(MaterialTheme.shapes.extraLarge)
+                                .background(Color.Green),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center
+                        ){
+                            Icon(
+                                modifier = Modifier.size(20.dp),
+                                imageVector = Icons.Rounded.Check,
+                                contentDescription = null,
+                                tint = Color.White,
+                            )
+                        }
+                    }
+
+                }
             }
         }
     }

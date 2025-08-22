@@ -5,6 +5,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -28,6 +29,23 @@ fun PrimaryButton(
             disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant
         )
     ) {
-        Text(text)
+        Text(text, style = MaterialTheme.typography.titleMedium)
+    }
+}
+
+@Composable
+fun CustomTextButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    text: String
+) {
+    TextButton(
+        onClick = onClick,
+        modifier = modifier.height(48.dp),
+        shape = MaterialTheme.shapes.extraLarge,
+        enabled = enabled
+    ) {
+        Text(text, style = MaterialTheme.typography.titleMedium)
     }
 }

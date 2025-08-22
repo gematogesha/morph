@@ -1,7 +1,7 @@
 package com.wheatley.morph.ui.theme
 import androidx.compose.ui.graphics.Color
 
-val primaryLight = Color(0xFF6B4EFE)
+val primaryLight = Color(0xFF194EFE)
 val onPrimaryLight = Color(0xFFFFFFFF)
 val primaryContainerLight = Color(0xFFFFDBD1)
 val onPrimaryContainerLight = Color(0xFF723523)

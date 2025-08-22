@@ -1,25 +1,33 @@
 package com.wheatley.morph.presentation.onboarding
 
 import android.content.Context
-import android.content.Intent
 import android.net.Uri
-import androidx.compose.material3.SnackbarHostState
 import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
-import com.wheatley.morph.data.local.helpers.SnackbarHelper
+import cafe.adriel.voyager.navigator.Navigator
 import com.wheatley.morph.data.local.prefs.User
-import com.wheatley.morph.presentation.DashboardActivity
+import com.wheatley.morph.presentation.DashboardScreen
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
 
 data class OnBoardingScreenState(
     val name: String = "",
-    var image: Uri? = null,
+    val image: Uri? = null,
     val step: Int = 0,
 )
 
+sealed interface OnBoardingEvent {
+    data class ShowMessage(val message: String) : OnBoardingEvent
+    data object SavedSuccessfully : OnBoardingEvent
+}
+
 class OnBoardingScreenModel(
-    val context: Context
+    private val context: Context
 ) : StateScreenModel<OnBoardingScreenState>(OnBoardingScreenState()) {
+
+    private val _events = MutableSharedFlow<OnBoardingEvent>()
+    val events: SharedFlow<OnBoardingEvent> = _events
 
     val isNameValid: Boolean
         get() = mutableState.value.name.isNotBlank()
@@ -47,24 +55,21 @@ class OnBoardingScreenModel(
         )
     }
 
-    fun save(snackbarHostState: SnackbarHostState, onSuccess: () -> Unit) {
+    fun save() {
+        val state = mutableState.value
         screenModelScope.launch {
             try {
-                val state = mutableState.value
                 User.saveUser(context, state.name, state.image?.toString())
-                onSuccess()
+                _events.emit(OnBoardingEvent.SavedSuccessfully)
             } catch (e: Exception) {
                 e.printStackTrace()
-                SnackbarHelper.show(snackbarHostState, "Произошла ошибка сохранения")
+                _events.emit(OnBoardingEvent.ShowMessage("Произошла ошибка сохранения"))
             }
         }
     }
 
-    fun exit() {
-        val intent = Intent(context, DashboardActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        }
-        context.startActivity(intent, null)
+    fun exit(navigator: Navigator?) {
+        navigator?.replace(DashboardScreen())
     }
 
     companion object {

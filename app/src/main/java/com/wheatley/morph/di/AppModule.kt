@@ -2,12 +2,14 @@ package com.wheatley.morph.di
 
 import android.content.Context
 import androidx.room.Room
+import com.wheatley.morph.core.app.UpdateManager
 import com.wheatley.morph.data.local.challenge.AppDatabase
 import com.wheatley.morph.data.local.challenge.ChallengeDao
 import com.wheatley.morph.data.local.challenge.ChallengeScreenModel
+import com.wheatley.morph.data.remote.UpdateApi
 import com.wheatley.morph.domain.repository.ChallengeRepository
 import com.wheatley.morph.data.repository.ChallengeRepositoryImpl
-import com.wheatley.morph.presentation.add.ChallengeAddScreenModel
+import com.wheatley.morph.presentation.add.AddChallengeScreenModel
 import com.wheatley.morph.presentation.onboarding.OnBoardingScreenModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
@@ -19,7 +21,6 @@ object DiModules {
         return Room.databaseBuilder(
             context,
             AppDatabase::class.java,
-            //TODO: Изменить имя DB
             "morph-db"
         )
             .fallbackToDestructiveMigration(false)
@@ -51,11 +52,16 @@ object DiModules {
     }
 
     val addChallengeModule = module {
-        factory { ChallengeAddScreenModel(get()) } // get() = ChallengeRepository
+        factory { AddChallengeScreenModel(get()) } // get() = ChallengeRepository
     }
 
     val onBoardingModule = module {
         factory { OnBoardingScreenModel(get()) }
+    }
+
+    val updateModule = module {
+        single { UpdateApi() }
+        single { UpdateManager(context = get(), api = get()) }
     }
 }
 
@@ -68,6 +74,7 @@ fun initKoinModules(context: Context) {
             DiModules.screenModelModule,
             DiModules.addChallengeModule,
             DiModules.onBoardingModule,
+            DiModules.updateModule
         )
     }
 }

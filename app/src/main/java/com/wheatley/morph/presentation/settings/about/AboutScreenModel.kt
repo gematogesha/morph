@@ -1,8 +1,12 @@
+// AboutScreenModel.kt
 package com.wheatley.morph.presentation.settings.about
 
-import android.content.Context
 import androidx.compose.material3.SnackbarHostState
 import cafe.adriel.voyager.core.model.StateScreenModel
+import cafe.adriel.voyager.core.model.screenModelScope
+import com.wheatley.morph.core.app.UpdateManager
+import com.wheatley.morph.data.local.helpers.SnackbarHelper
+import com.wheatley.morph.domain.model.UpdateInfo
 
 data class AboutScreenState(
     val isLoading: Boolean = false,
@@ -12,14 +16,30 @@ data class AboutScreenState(
     val downloadLink: String = ""
 )
 
-class AboutScreenModel(
-    private val context: Context
-) : StateScreenModel<AboutScreenState>(AboutScreenState()) {
+class AboutScreenModel : StateScreenModel<AboutScreenState>(AboutScreenState()) {
 
-    fun checkForUpdate(snackbarHostState: SnackbarHostState) {
-        //mutableState.value = mutableState.value.copy(isLoading = true)
-        mutableState.value = mutableState.value.copy(isLoading = false)
-
+    fun checkUpdate(snackbarHostState: SnackbarHostState, updateManager: UpdateManager) {
+        val scope = screenModelScope
+        mutableState.value = mutableState.value.copy(isLoading = true)
+        updateManager.checkForUpdate(
+            onUpdateAvailable = { update ->
+                mutableState.value = mutableState.value.copy(
+                    isLoading = false,
+                    showSheet = true,
+                    version = update.version,
+                    downloadLink = update.apkUrl,
+                    changelog = update.changelog
+                )
+            },
+            onNoUpdate = {
+                mutableState.value = mutableState.value.copy(isLoading = false)
+                SnackbarHelper.show(scope, snackbarHostState, "Вы используете актуальную версию")
+            },
+            onError = {
+                mutableState.value = mutableState.value.copy(isLoading = false)
+                SnackbarHelper.show(scope, snackbarHostState, "Не удалось проверить обновление")
+            }
+        )
     }
 
     fun dismissSheet() {
