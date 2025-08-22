@@ -1,8 +1,11 @@
 package com.wheatley.morph.ui.theme
-import com.wheatley.morph.util.ui.ThemeManager
+import android.app.Activity
 import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MotionScheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
@@ -11,12 +14,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
+import androidx.core.view.WindowCompat
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import com.wheatley.morph.util.app.darken
-import com.wheatley.morph.util.app.lighten
+import com.wheatley.morph.core.app.darken
+import com.wheatley.morph.core.app.lighten
 
 private val lightScheme = lightColorScheme(
     primary = primaryLight,
@@ -120,65 +127,65 @@ val extendedLight = ExtendedColorScheme(
     primary = ColorFamily(
         color = primary,
         secondColor = lighten(primary, 0.35f),
-        colorContainer = lighten(primary, 0.8f),
+        colorContainer = lighten(primary, 0.85f),
         onColorContainer = darken(primary, 0.05f)
     ),
     green = ColorFamily(
         color = green,
         secondColor = lighten(green, 0.35f),
-        colorContainer = lighten(green, 0.8f),
+        colorContainer = lighten(green, 0.85f),
         onColorContainer = darken(green, 0.05f)
     ),
     orange = ColorFamily(
         color = orange,
         secondColor = lighten(orange, 0.35f),
-        colorContainer = lighten(orange, 0.8f),
+        colorContainer = lighten(orange, 0.85f),
         onColorContainer = darken(orange, 0.05f)
     ),
     mint = ColorFamily(
         color = mint,
         secondColor = lighten(mint, 0.35f),
-        colorContainer = lighten(mint, 0.8f),
+        colorContainer = lighten(mint, 0.85f),
         onColorContainer = darken(mint, 0.05f)
     ),
     lightPurple = ColorFamily(
         color = lightPurple,
         secondColor = lighten(lightPurple, 0.35f),
-        colorContainer = lighten(lightPurple, 0.8f),
+        colorContainer = lighten(lightPurple, 0.855f),
         onColorContainer = darken(lightPurple, 0.05f)
     ),
     yellow = ColorFamily(
         color = yellow,
         secondColor = lighten(yellow, 0.35f),
-        colorContainer = lighten(yellow, 0.8f),
+        colorContainer = lighten(yellow, 0.85f),
         onColorContainer = darken(yellow, 0.05f)
     ),
     pink = ColorFamily(
         color = pink,
         secondColor = lighten(pink, 0.35f),
-        colorContainer = lighten(pink, 0.8f),
+        colorContainer = lighten(pink, 0.85f),
         onColorContainer = darken(pink, 0.05f)
     ),
     bluePurple = ColorFamily(
         color = bluePurple,
         secondColor = lighten(bluePurple, 0.35f),
-        colorContainer = lighten(bluePurple, 0.8f),
+        colorContainer = lighten(bluePurple, 0.85f),
         onColorContainer = darken(bluePurple, 0.05f)
     ),
     lightGreen = ColorFamily(
         color = lightGreen,
         secondColor = lighten(lightGreen, 0.35f),
-        colorContainer = lighten(lightGreen, 0.8f),
+        colorContainer = lighten(lightGreen, 0.85f),
         onColorContainer = darken(lightGreen, 0.05f)
     )
 )
 
 val extendedDark = ExtendedColorScheme(
     primary = ColorFamily(
-        color = primary,
-        secondColor = lighten(primary, 0.35f),
-        colorContainer = lighten(primary, 0.8f),
-        onColorContainer = darken(primary, 0.05f)
+        color = darken(primary, 0.5f),
+        secondColor = darken(primary, 0.2f),
+        colorContainer = darken(primary, 0.6f),
+        onColorContainer = darken(primary, 0.2f)
     ),
     green = ColorFamily(
         color = darken(green, 0.5f),
@@ -232,14 +239,14 @@ val extendedDark = ExtendedColorScheme(
 
 val LocalExColorScheme = staticCompositionLocalOf { extendedLight }
 
+@RequiresApi(Build.VERSION_CODES.Q)
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun MorphTheme(
     dynamicColor: Boolean = false,
     content: @Composable() () -> Unit
 ) {
     val darkTheme = isDarkThemeEnabled()
-
-    ApplySystemUi()
 
     val colorScheme = when {
       dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
@@ -251,59 +258,35 @@ fun MorphTheme(
       else -> lightScheme
     }
 
+    val view = LocalView.current
+    if (!view.isInEditMode) {
+        SideEffect {
+            val window = (view.context as Activity).window
+            window.navigationBarColor = colorScheme.surfaceContainer.toArgb()
+            window.isNavigationBarContrastEnforced = true
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
+            WindowCompat.getInsetsController(window, view).isAppearanceLightNavigationBars = !darkTheme
+        }
+    }
+
     val extendedColorScheme = if (darkTheme) extendedDark else extendedLight
 
     CompositionLocalProvider(LocalExColorScheme provides extendedColorScheme) {
         MaterialTheme(
             colorScheme = colorScheme,
             typography = MorphTypography,
-            content = content
+            content = content,
+            motionScheme = MotionScheme.expressive()
         )
     }
 }
+
 
 @Composable
 fun isDarkThemeEnabled(): Boolean {
-    return when (ThemeManager.currentTheme.value) {
+    return when (ThemeManager.currentTheme) {
         "light" -> false
         "dark" -> true
         else -> isSystemInDarkTheme()
-    }
-}
-
-@Composable
-fun ApplySystemUi() {
-    val systemUiController = rememberSystemUiController()
-    val navBarColor = MaterialTheme.colorScheme.surfaceContainer
-    val darkTheme = isDarkThemeEnabled()
-
-    DisposableEffect(systemUiController, darkTheme) {
-
-        systemUiController.setSystemBarsColor(
-            color = Color.Transparent,
-            darkIcons = !darkTheme
-        )
-
-        systemUiController.setNavigationBarColor(
-            color = navBarColor,
-        )
-
-        onDispose {}
-    }
-}
-
-@Composable
-fun ApplySystemUiRegister() {
-    val systemUiController = rememberSystemUiController()
-    val darkTheme = isDarkThemeEnabled()
-
-    DisposableEffect(systemUiController, darkTheme) {
-
-        systemUiController.setSystemBarsColor(
-            color = Color.Transparent,
-            darkIcons = !darkTheme
-        )
-
-        onDispose {}
     }
 }

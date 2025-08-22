@@ -1,0 +1,240 @@
+package com.wheatley.morph.presentation.components
+
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.wheatley.morph.domain.model.Challenge
+import com.wheatley.morph.core.app.color
+import com.wheatley.morph.core.app.colorContainer
+import com.wheatley.morph.core.app.secondColor
+
+@Composable
+fun CardSmall(
+    modifier: Modifier = Modifier,
+    color: Color = MaterialTheme.colorScheme.surfaceContainer,
+    content: @Composable () -> Unit = {}
+) {
+    Card(
+        colors = CardColors(
+            containerColor = color,
+            contentColor = MaterialTheme.colorScheme.onSurface,
+            disabledContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+            disabledContentColor = MaterialTheme.colorScheme.surfaceContainer,
+        ),
+        modifier = modifier
+            .fillMaxWidth(),
+    ) {
+        Row(
+            modifier = Modifier
+                .padding(8.dp)
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            content()
+        }
+    }
+}
+
+@Composable
+fun CardAction(
+    modifier: Modifier = Modifier,
+    colorTop: Color,
+    colorBottom: Color,
+    icon: String,
+    label: String,
+    number: String = "",
+    numberColor: Color,
+    actionIcon: ImageVector,
+    action: () -> Unit,
+) {
+    CardSmall(
+        modifier = modifier
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier
+            ) {
+                CardBadge(
+                    colorTop = colorTop,
+                    colorBottom = colorBottom,
+                    icon = icon
+                )
+                Text(
+                    text = label,
+                    style = MaterialTheme.typography.titleMedium,
+                )
+
+            }
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+
+                ) {
+                Text(
+                    text = number,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = numberColor
+                )
+                IconButton(
+                    onClick = { action() }
+                ) {
+                    Icon(imageVector = actionIcon, contentDescription = null)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun CardBig(
+    modifier: Modifier = Modifier,
+    color: Color = MaterialTheme.colorScheme.surfaceContainer,
+    content: @Composable () -> Unit = {},
+) {
+    Card(
+        modifier = modifier
+            .fillMaxWidth(),
+        shape = RoundedCornerShape(20.dp),
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(color),
+        ) {
+            Row(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                content()
+            }
+        }
+    }
+}
+
+
+@Composable
+fun ChallengeCard(
+    challenge: Challenge,
+    completedDays: Int,
+    action: (() -> Unit)? = null,
+) {
+    val animatedProgress by animateFloatAsState(
+        targetValue = (completedDays.toFloat() / challenge.duration).coerceIn(0f, 1f),
+        animationSpec = tween(300),
+        label = "animatedProgress"
+    )
+
+    CardBig(
+        modifier = Modifier
+            .clickable {
+                if (action != null) {
+                    action()
+                }
+            },
+        color = challenge.color.colorContainer()
+    ) {
+        Column (
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            CardBadge(
+                colorTop = challenge.color.secondColor(),
+                colorBottom = challenge.color.color(),
+                icon = challenge.emoji
+            )
+            Column {
+                Text(
+                    text = challenge.name,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = "Описание",
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.outline
+                )
+            }
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = "$completedDays/${challenge.duration}",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = challenge.color.color(),
+                textAlign = TextAlign.End
+
+            )
+            LinearProgressIndicator(
+                modifier = Modifier.fillMaxWidth(),
+                progress = { animatedProgress },
+                color = challenge.color.color(),
+                trackColor = MaterialTheme.colorScheme.outlineVariant,
+            )
+        }
+    }
+}
+
+@Composable
+fun CardBadge(
+    modifier: Modifier = Modifier,
+    icon: String,
+    colorTop: Color,
+    colorBottom: Color
+) {
+    Box(
+        modifier = modifier
+            .height(48.dp)
+            .width(48.dp)
+            .aspectRatio(1f)
+            .clip(RoundedCornerShape(12.dp))
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(colorTop, colorBottom)
+                )
+            ),
+        contentAlignment = Alignment.Center
+        ){
+            Text(
+                fontSize = 24.sp,
+                text = icon,
+            )
+    }
+}

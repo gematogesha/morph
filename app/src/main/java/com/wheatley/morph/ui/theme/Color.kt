@@ -1,7 +1,7 @@
 package com.wheatley.morph.ui.theme
 import androidx.compose.ui.graphics.Color
 
-val primaryLight = Color(0xFF6B4EFE)
+val primaryLight = Color(0xFF194EFE)
 val onPrimaryLight = Color(0xFFFFFFFF)
 val primaryContainerLight = Color(0xFFFFDBD1)
 val onPrimaryContainerLight = Color(0xFF723523)
@@ -23,7 +23,7 @@ val surfaceLight = Color(0xFFFFFFFF)
 val onSurfaceLight = Color(0xFF000000)
 val surfaceVariantLight = Color(0xFFF5DED8)
 val onSurfaceVariantLight = Color(0xFF53433F)
-val outlineLight = Color(0xFF282828)
+val outlineLight = Color(0xFF787878)
 val outlineVariantLight = Color(0xFFBEBEBE)
 val scrimLight = Color(0xFF000000)
 val inverseSurfaceLight = Color(0xFF392E2B)
@@ -83,6 +83,8 @@ val yellow= Color(0xFFF6C344)
 val lightGreen= Color(0xFF99EC90)
 val green= Color(0xFF63B15D)
 val mint= Color(0xFF7CF2CD)
+val error = Color(0xFFF75555)
+val done = Color(0xFF12D18E)
 
 
 

@@ -19,8 +19,8 @@ android {
         applicationId = "com.wheatley.morph"
         minSdk = 26
         targetSdk = 36
-        versionCode = 3
-        versionName = "0.6.0"
+        versionCode = 4
+        versionName = "0.7.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -71,6 +71,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.ui.text.google.fonts)
     implementation(libs.androidx.material3)
+    implementation(libs.material)
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.accompanist.systemuicontroller)
 
@@ -83,9 +84,19 @@ dependencies {
 
     // Navigation
     implementation(libs.androidx.navigation.compose.android)
+
+    // Voyager
     implementation(libs.voyager.navigator)
+    implementation(libs.voyager.screenmodel)
+    implementation(libs.voyager.bottom.sheet.navigator)
     implementation(libs.voyager.tab.navigator)
+    implementation(libs.voyager.transitions)
     implementation(libs.voyager.koin)
+
+    // Koin
+    implementation(libs.koin.core)
+    implementation(libs.koin.android)
+    implementation(libs.koin.androidx.compose)
 
     // Database
     implementation(libs.androidx.room.runtime)
@@ -100,9 +111,6 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.androidx.datastore.preferences)
 
-    // Markdown
-    implementation(libs.multiplatform.markdown.renderer.android)
-
     // Background Work
     implementation(libs.androidx.work.runtime.ktx)
 
@@ -116,4 +124,28 @@ dependencies {
     // Debug Tools
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    //Markdown
+    implementation("io.noties.markwon:core:4.6.2") {
+        exclude(group = "org.jetbrains", module = "annotations-java5")
+    }
+    implementation("io.noties.markwon:ext-tables:4.6.2") {
+        exclude(group = "org.jetbrains", module = "annotations-java5")
+    }
+    implementation("io.noties.markwon:html:4.6.2") {
+        exclude(group = "org.jetbrains", module = "annotations-java5")
+    }
+    implementation("io.noties.markwon:linkify:4.6.2") {
+        exclude(group = "org.jetbrains", module = "annotations-java5")
+    }
+    implementation("io.noties.markwon:image-coil:4.6.2") {
+        exclude(group = "org.jetbrains", module = "annotations-java5")
+    }
+    implementation("io.noties.markwon:syntax-highlight:4.6.2") {
+        exclude(group = "org.jetbrains", module = "annotations-java5")
+    }
+
+
+    implementation("org.jetbrains:annotations:26.0.2")
+
 }
