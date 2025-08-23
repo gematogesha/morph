@@ -15,6 +15,8 @@ import com.wheatley.morph.R
 import com.wheatley.morph.domain.model.UpdateInfo
 import java.io.File
 
+//TODO: Реализовать уведомления
+
 private const val CHANNEL_ID = "update_channel"
 private const val NOTIFICATION_ID = 1001
 

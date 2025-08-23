@@ -54,6 +54,7 @@ class UpdateManager(
     fun downloadAndInstall(
         updateInfo: UpdateInfo,
         onProgress: (Int) -> Unit = {},
+        onSuccess: () -> Unit = {},
         onError: (Throwable) -> Unit = {}
     ) {
         currentUpdateInfo = updateInfo
@@ -93,7 +94,7 @@ class UpdateManager(
 
             // корректная динамическая регистрация ресивера (EXPORTED для внешнего бродкаста)
             val filter = IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE)
-            receiver = onCompleteReceiver(onError)
+            receiver = onCompleteReceiver(onSuccess, onError)
 
             if (Build.VERSION.SDK_INT >= 26) {
                 val flags = if (Build.VERSION.SDK_INT >= 31) Context.RECEIVER_EXPORTED else 0
@@ -117,8 +118,8 @@ class UpdateManager(
                     while (downloadId != null && !shouldStop) {
                         dm.query(DownloadManager.Query().setFilterById(downloadId!!))?.use { c ->
                             if (c.moveToFirst()) {
-                                val done = c.getInt(c.getColumnIndexOrThrow(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR))
-                                val total = c.getInt(c.getColumnIndexOrThrow(DownloadManager.COLUMN_TOTAL_SIZE_BYTES))
+                                val done = c.getLong(c.getColumnIndexOrThrow(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR))
+                                val total = c.getLong(c.getColumnIndexOrThrow(DownloadManager.COLUMN_TOTAL_SIZE_BYTES))
                                 val status = c.getInt(c.getColumnIndexOrThrow(DownloadManager.COLUMN_STATUS))
                                 val reason = c.getInt(c.getColumnIndexOrThrow(DownloadManager.COLUMN_REASON))
 
@@ -131,7 +132,10 @@ class UpdateManager(
                                 // страхуемся: если SUCCESSFUL увидели здесь, запускаем установку сразу
                                 if (status == DownloadManager.STATUS_SUCCESSFUL) {
                                     scope.launch {
-                                        try { installDownloadedApk() } catch (t: Throwable) { onError(t) }
+                                        try {
+                                            onSuccess()
+                                            installDownloadedApk()
+                                        } catch (t: Throwable) { onError(t) }
                                     }
                                     shouldStop = true
                                 }
@@ -150,6 +154,7 @@ class UpdateManager(
     }
 
     private fun onCompleteReceiver(
+        onSuccess: () -> Unit,
         onError: (Throwable) -> Unit
     ) = object : BroadcastReceiver() {
         override fun onReceive(ctx: Context?, intent: Intent?) {
@@ -185,7 +190,10 @@ class UpdateManager(
                                         }
                                     } ?: onError(IllegalStateException("UpdateInfo отсутствует"))
                                 } else {
-                                    runCatching { installDownloadedApk() }
+                                    runCatching {
+                                        onSuccess()
+                                        installDownloadedApk()
+                                    }
                                         .onFailure(onError)
                                 }
                             }

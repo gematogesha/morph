@@ -29,6 +29,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -42,14 +43,18 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.media3.common.util.Log
+import androidx.media3.common.util.UnstableApi
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.wheatley.morph.R
 import com.wheatley.morph.core.app.AppInfo.getVersionName
 import com.wheatley.morph.core.app.UpdateManager
+import com.wheatley.morph.data.local.helpers.SnackbarHelper
 import com.wheatley.morph.presentation.components.SettingsItem
 import com.wheatley.morph.presentation.update.UpdateScreen
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 
@@ -57,6 +62,7 @@ import org.koin.compose.koinInject
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 class AboutScreen : Screen {
 
+    @androidx.annotation.OptIn(UnstableApi::class)
     @Composable
     override fun Content() {
         val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
@@ -66,8 +72,9 @@ class AboutScreen : Screen {
 
         val snackbarHostState = remember { SnackbarHostState() }
 
-
         val updateManager: UpdateManager = koinInject()
+
+        val scope = rememberCoroutineScope()
 
         Scaffold(
             modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -130,7 +137,24 @@ class AboutScreen : Screen {
                         onDismiss = { model.dismissSheet() },
                         onInstallClick = {
                             state.updateInfo?.let { update ->
-                                updateManager.downloadAndInstall(update)
+                                updateManager.downloadAndInstall(
+                                    update,
+                                    onProgress = {
+                                        scope.launch {
+                                            SnackbarHelper.show(scope, snackbarHostState, "Загрузка обновления...")
+                                        }
+                                    },
+                                    onSuccess = {
+                                        scope.launch {
+                                            SnackbarHelper.show(scope, snackbarHostState, "Приложение вот-вот обновится")
+                                        }
+                                    },
+                                    onError = { e ->
+                                        scope.launch {
+                                            SnackbarHelper.show(scope, snackbarHostState, "Ошибка: ${e.message}")
+                                        }
+                                    }
+                                )
                             }
                         }
                     )

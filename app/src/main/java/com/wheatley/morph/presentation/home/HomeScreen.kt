@@ -120,98 +120,114 @@ class HomeScreen: Screen {
                 SnackbarHost(hostState = snackbarHostState)
             }
         ) { innerPadding ->
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding)
-                    .padding(horizontal = 24.dp)
+            Surface(
+                modifier = Modifier.fillMaxSize()
             ) {
-                // вкладки
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween)
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding)
+                        .padding(horizontal = 24.dp)
                 ) {
-                    tabLabels.forEachIndexed { index, label ->
-                        ToggleButton(
-                            checked = activeTabIndex == index,
-                            onCheckedChange = {
-                                if (index != activeTabIndex) {
-                                    previousTabIndex = activeTabIndex
-                                    activeTabIndex = index
+                    // вкладки
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween)
+                    ) {
+                        tabLabels.forEachIndexed { index, label ->
+                            ToggleButton(
+                                checked = activeTabIndex == index,
+                                onCheckedChange = {
+                                    if (index != activeTabIndex) {
+                                        previousTabIndex = activeTabIndex
+                                        activeTabIndex = index
+                                    }
+                                },
+                                modifier = Modifier.weight(1f),
+                                shapes = when (index) {
+                                    0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
+                                    tabLabels.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
+                                    else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
                                 }
-                            },
-                            modifier = Modifier.weight(1f),
-                            shapes = when(index){
-                                0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
-                                tabLabels.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
-                                else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
-                            }
-                        ) { Text(label, style = MaterialTheme.typography.titleMedium) }
-                    }
-                }
-
-                // фильтры
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween)
-                ) {
-                    periodFilters.forEachIndexed { index, label ->
-                        ToggleButton(
-                            checked = selectedPeriodIndex == index,
-                            onCheckedChange = { selectedPeriodIndex = index },
-                            modifier = Modifier.weight(1f),
-                            shapes = when(index){
-                                0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
-                                periodFilters.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
-                                else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
-                            }
-                        ) { Text(label, style = MaterialTheme.typography.titleMedium) }
-                    }
-                }
-
-                // Navigator с одним экраном в зависимости от вкладки
-                val forward = activeTabIndex > previousTabIndex
-                AnimatedContent(
-                    targetState = activeTabIndex,
-                    transitionSpec = {
-                        if (forward) {
-                            slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Left, tween(250)) togetherWith
-                                    slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Left, tween(250))
-                        } else {
-                            slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Right, tween(250)) togetherWith
-                                    slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Right, tween(250))
+                            ) { Text(label, style = MaterialTheme.typography.titleMedium) }
                         }
                     }
-                ) { tab ->
-                    when(tab){
-                        0 -> todayScreen.Content()
-                        1 -> weeklyScreen.Content()
-                    }
-                }
-            }
 
-            // BottomSheet
-            if(showBottomSheet){
-                ModalBottomSheet(
-                    sheetGesturesEnabled = false,
-                    dragHandle = null,
-                    onDismissRequest = { showBottomSheet = false },
-                    sheetState = sheetState
-                ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.End
-                        ) {
-                            IconButton(onClick = {
-                                scope.launch { sheetState.hide() }.invokeOnCompletion {
-                                    if(!sheetState.isVisible) showBottomSheet = false
+                    // фильтры
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween)
+                    ) {
+                        periodFilters.forEachIndexed { index, label ->
+                            ToggleButton(
+                                checked = selectedPeriodIndex == index,
+                                onCheckedChange = { selectedPeriodIndex = index },
+                                modifier = Modifier.weight(1f),
+                                shapes = when (index) {
+                                    0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
+                                    periodFilters.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
+                                    else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
                                 }
-                            }) {
-                                Icon(Icons.Default.Close, null)
+                            ) { Text(label, style = MaterialTheme.typography.titleMedium) }
+                        }
+                    }
+
+                    // Navigator с одним экраном в зависимости от вкладки
+                    val forward = activeTabIndex > previousTabIndex
+                    AnimatedContent(
+                        targetState = activeTabIndex,
+                        transitionSpec = {
+                            if (forward) {
+                                slideIntoContainer(
+                                    AnimatedContentTransitionScope.SlideDirection.Left,
+                                    tween(250)
+                                ) togetherWith
+                                        slideOutOfContainer(
+                                            AnimatedContentTransitionScope.SlideDirection.Left,
+                                            tween(250)
+                                        )
+                            } else {
+                                slideIntoContainer(
+                                    AnimatedContentTransitionScope.SlideDirection.Right,
+                                    tween(250)
+                                ) togetherWith
+                                        slideOutOfContainer(
+                                            AnimatedContentTransitionScope.SlideDirection.Right,
+                                            tween(250)
+                                        )
                             }
                         }
-                        Text("Текст")
+                    ) { tab ->
+                        when (tab) {
+                            0 -> todayScreen.Content()
+                            1 -> weeklyScreen.Content()
+                        }
+                    }
+                }
+
+                // BottomSheet
+                if (showBottomSheet) {
+                    ModalBottomSheet(
+                        sheetGesturesEnabled = false,
+                        dragHandle = null,
+                        onDismissRequest = { showBottomSheet = false },
+                        sheetState = sheetState
+                    ) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.End
+                            ) {
+                                IconButton(onClick = {
+                                    scope.launch { sheetState.hide() }.invokeOnCompletion {
+                                        if (!sheetState.isVisible) showBottomSheet = false
+                                    }
+                                }) {
+                                    Icon(Icons.Default.Close, null)
+                                }
+                            }
+                            Text("Текст")
+                        }
                     }
                 }
             }
