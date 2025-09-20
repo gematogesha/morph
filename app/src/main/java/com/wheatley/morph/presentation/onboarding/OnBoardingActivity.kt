@@ -33,7 +33,7 @@ import com.wheatley.morph.ui.theme.MorphTheme
 import com.wheatley.morph.ui.theme.ThemeManager
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
-@SuppressLint("UnusedCrossroadTargetStateParameter", "UnusedMaterial3ScaffoldPaddingParameter",
+@SuppressLint("UnusedCrossfadeTargetStateParameter", "UnusedMaterial3ScaffoldPaddingParameter",
     "StateFlowValueCalledInComposition"
 )
 class OnBoardingScreen() : Screen {
