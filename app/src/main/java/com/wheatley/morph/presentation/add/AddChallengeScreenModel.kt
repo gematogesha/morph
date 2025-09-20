@@ -1,13 +1,14 @@
 package com.wheatley.morph.presentation.add
 
 import androidx.annotation.OptIn
-import androidx.media3.common.util.Log
 import androidx.media3.common.util.UnstableApi
 import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.wheatley.morph.domain.model.Challenge
 import com.wheatley.morph.domain.model.ChallengeColor
+import com.wheatley.morph.domain.model.Time
 import com.wheatley.morph.domain.repository.ChallengeRepository
+import com.wheatley.morph.notifications.ChallengeReminderScheduler
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
@@ -20,6 +21,7 @@ data class AddChallengeState(
     val emoji: String = "",
     val duration: Int = 7,
     val color: ChallengeColor = ChallengeColor.LIGHTPURPLE,
+    val notifyAt: Time? = null,
     val resetTrigger: Boolean = false
 )
 
@@ -32,7 +34,8 @@ sealed interface AddChallengeEvent {
 // ---------- SCREEN MODEL ----------
 
 class AddChallengeScreenModel(
-    private val repository: ChallengeRepository
+    private val repository: ChallengeRepository,
+    private val reminderScheduler: ChallengeReminderScheduler
 ) : StateScreenModel<AddChallengeState>(AddChallengeState()) {
 
     private val scope = screenModelScope
@@ -48,6 +51,7 @@ class AddChallengeScreenModel(
     fun updateEmoji(emoji: String) = updateState { copy(emoji = emoji) }
     fun updateDuration(duration: Int) = updateState { copy(duration = duration) }
     fun updateColor(color: ChallengeColor) = updateState { copy(color = color) }
+    fun updateNotifyAt(time: Time?) = updateState { copy(notifyAt = time) }
 
     @OptIn(UnstableApi::class)
     fun save() {
@@ -64,15 +68,17 @@ class AddChallengeScreenModel(
             mutableState.value = state.copy(isSaving = true)
 
             runCatching {
-                repository.addChallenge(
-                    Challenge(
-                        name = state.name.trim(),
-                        emoji = state.emoji.trim(),
-                        duration = state.duration,
-                        color = state.color
-                    )
+                val challenge = Challenge(
+                    name = state.name.trim(),
+                    emoji = state.emoji.trim(),
+                    duration = state.duration,
+                    notifyAt = state.notifyAt,
+                    color = state.color
                 )
+                val id = repository.addChallenge(challenge)
+                reminderScheduler.schedule(challenge.copy(id = id))
             }.onFailure {
+                mutableState.value = mutableState.value.copy(isSaving = false)
                 _events.emit(AddChallengeEvent.ShowMessage(it.message ?: "Не удалось добавить достижение"))
             }.onSuccess {
                 mutableState.value = AddChallengeState(resetTrigger = true) // сброс формы

@@ -5,9 +5,10 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import com.wheatley.morph.core.date.truncateToDay
 import com.wheatley.morph.domain.model.Challenge
 import com.wheatley.morph.domain.model.ChallengeEntry
-import com.wheatley.morph.domain.model.calculateCurrentStreak
 import com.wheatley.morph.domain.model.calculateMaxStreak
+import com.wheatley.morph.domain.model.calculateCurrentStreak
 import com.wheatley.morph.domain.repository.ChallengeRepository
+import com.wheatley.morph.notifications.ChallengeReminderScheduler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -48,7 +49,8 @@ sealed interface ChallengeEvent {
 // ---------- SCREEN MODEL ----------
 
 class ChallengeScreenModel(
-    private val repository: ChallengeRepository
+    private val repository: ChallengeRepository,
+    private val reminderScheduler: ChallengeReminderScheduler
 ) : ScreenModel {
 
     private val scope = screenModelScope
@@ -102,6 +104,11 @@ class ChallengeScreenModel(
                 repository.toggleChallengeCompletion(challengeId, date, completed)
             }.onFailure {
                 _events.emit(ChallengeEvent.ShowMessage(it.message ?: "Failed to toggle completion"))
+            }.onSuccess {
+                val today = Date().truncateToDay()
+                val toggledDay = date.truncateToDay()
+                val scheduleNextDay = completed && toggledDay == today
+                reminderScheduler.refreshFor(challengeId, scheduleNextDay)
             }
         }
     }
@@ -119,6 +126,9 @@ class ChallengeScreenModel(
         scope.launch {
             runCatching { repository.addChallenge(challenge) }
                 .onFailure { _events.emit(ChallengeEvent.ShowMessage(it.message ?: "Failed to add challenge")) }
+                .onSuccess { id ->
+                    reminderScheduler.schedule(challenge.copy(id = id))
+                }
         }
     }
 
@@ -126,6 +136,9 @@ class ChallengeScreenModel(
         scope.launch {
             runCatching { repository.updateChallenge(challenge) }
                 .onFailure { _events.emit(ChallengeEvent.ShowMessage(it.message ?: "Failed to update challenge")) }
+                .onSuccess {
+                    reminderScheduler.schedule(challenge)
+                }
         }
     }
 
@@ -133,6 +146,9 @@ class ChallengeScreenModel(
         scope.launch {
             runCatching { repository.deleteChallenge(challenge) }
                 .onFailure { _events.emit(ChallengeEvent.ShowMessage(it.message ?: "Failed to delete challenge")) }
+                .onSuccess {
+                    reminderScheduler.cancel(challenge.id)
+                }
         }
     }
 

@@ -16,7 +16,7 @@ interface ChallengeRepository {
 
     suspend fun getCurrentStreak(): Int
     suspend fun getMaxStreak(): Int
-    suspend fun addChallenge(challenge: Challenge)
+    suspend fun addChallenge(challenge: Challenge): Long
     suspend fun updateChallenge(challenge: Challenge)
     suspend fun deleteChallenge(challenge: Challenge)
     suspend fun toggleChallengeCompletion(challengeId: Long, date: Date, completed: Boolean)

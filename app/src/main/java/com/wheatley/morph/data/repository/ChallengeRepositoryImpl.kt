@@ -33,8 +33,8 @@ class ChallengeRepositoryImpl(
 
     override fun getAllEntries(): Flow<List<ChallengeEntry>> = dao.getAllEntries()
 
-    override suspend fun addChallenge(challenge: Challenge) {
-        dao.insertChallenge(challenge)
+    override suspend fun addChallenge(challenge: Challenge): Long {
+        return dao.insertChallenge(challenge)
     }
 
     override suspend fun updateChallenge(challenge: Challenge)  = dao.updateChallenge(challenge)
