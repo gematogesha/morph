@@ -1,27 +1,25 @@
 package com.wheatley.morph.presentation.home
 
 import android.annotation.SuppressLint
+import android.widget.Toast
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonGroupDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -33,7 +31,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MediumFloatingActionButton
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
@@ -53,14 +50,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.media3.common.util.UnstableApi
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.koinScreenModel
-import cafe.adriel.voyager.navigator.Navigator
-import cafe.adriel.voyager.navigator.NavigatorDisposeBehavior
 import com.wheatley.morph.data.local.challenge.ChallengeEvent
 import com.wheatley.morph.data.local.challenge.ChallengeScreenModel
+import com.wheatley.morph.data.local.helpers.NotifierHelper
 import com.wheatley.morph.data.local.helpers.SnackbarHelper
 import com.wheatley.morph.presentation.components.SwipeListChallenge
 import kotlinx.coroutines.launch
@@ -129,6 +126,9 @@ class HomeScreen: Screen {
                         .padding(innerPadding)
                         .padding(horizontal = 24.dp)
                 ) {
+                    Row(){
+                        SimpleNotificationDemo()
+                    }
                     // вкладки
                     Row(
                         modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
@@ -235,6 +235,36 @@ class HomeScreen: Screen {
     }
 }
 
+@androidx.compose.runtime.Composable
+fun SimpleNotificationDemo() {
+    val context = LocalContext.current
+
+    Button(onClick = {
+        when (val result = NotifierHelper.show(
+            context = context,
+            id = 1001,
+            title = "Привет 👋",
+            text = "Это простое тестовое уведомление."
+        )) {
+            NotifierHelper.Result.Shown -> {
+                // можно показать Toast / Snackbar
+            }
+            NotifierHelper.Result.NoPermission -> {
+                Toast.makeText(context, "Нет разрешения на уведомления", Toast.LENGTH_SHORT).show()
+            }
+            is NotifierHelper.Result.Error -> {
+                Toast.makeText(context, "Ошибка: ${result.throwable}", Toast.LENGTH_SHORT).show()
+            }
+
+            NotifierHelper.Result.UserDisabled -> {
+                // можно показать Toast / Snackbar
+            }
+        }
+    }) {
+        Text("Показать уведомление")
+    }
+}
+
 
 class TodayScreen(
     private val snackbarHostState: SnackbarHostState
@@ -262,6 +292,7 @@ class TodayScreen(
         ) {
             items(state.inProgressChallenges, key = { "inProgress_${it.id}" }) { challenge ->
                 SwipeListChallenge(
+                    modifier = Modifier.animateItem(),
                     challenge = challenge,
                     onDone = { screenModel.toggleChallengeCompletion(challenge.id, Date(), true) },
                     onRemove = { screenModel.inDev() },
@@ -271,7 +302,9 @@ class TodayScreen(
             if (state.completedChallenges.isNotEmpty()) {
                 item{
                     Row(
-                        modifier = Modifier.padding(bottom = 16.dp),
+                        modifier = Modifier
+                            .padding(bottom = 16.dp)
+                            .animateItem(),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
@@ -288,6 +321,7 @@ class TodayScreen(
             }
             items(state.completedChallenges, key = { "completed_${it.id}" }) { challenge ->
                 SwipeListChallenge(
+                    modifier = Modifier.animateItem(),
                     challenge = challenge,
                     onDone = { screenModel.toggleChallengeCompletion(challenge.id, Date(), false) },
                     onRemove = { screenModel.inDev() },

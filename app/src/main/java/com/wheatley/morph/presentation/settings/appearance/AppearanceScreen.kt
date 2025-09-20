@@ -1,12 +1,5 @@
 package com.wheatley.morph.presentation.settings.appearance
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.expandHorizontally
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.shrinkHorizontally
-import androidx.compose.animation.shrinkVertically
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -133,36 +126,31 @@ class AppearanceScreen : Screen {
                         }
                     }
                     item {
-                        AnimatedVisibility(
-                            visible = selectedTheme != "light",
-                            enter = expandVertically(),
-                            exit = shrinkVertically()
-                        ) {
-                            SettingsItem(
-                                title = "Темный режим с чистым черным",
-                                action = {
-                                    useTrueDarkColor = !useTrueDarkColor
-                                    SettingsManager.setBoolean(
-                                        context,
-                                        SettingsKeys.TRUE_DARK_COLOR,
-                                        useTrueDarkColor
-                                    )
-                                },
-                                trailingContent = {
-                                    Switch(
-                                        checked = useTrueDarkColor,
-                                        onCheckedChange = {
-                                            useTrueDarkColor = it
-                                            SettingsManager.setBoolean(
-                                                context,
-                                                SettingsKeys.TRUE_DARK_COLOR,
-                                                it
-                                            )
-                                        }
-                                    )
-                                }
-                            )
-                        }
+                        SettingsItem(
+                            modifier = Modifier.animateItem(),
+                            title = "Темный режим с чистым черным",
+                            action = {
+                                useTrueDarkColor = !useTrueDarkColor
+                                SettingsManager.setBoolean(
+                                    context,
+                                    SettingsKeys.TRUE_DARK_COLOR,
+                                    useTrueDarkColor
+                                )
+                            },
+                            trailingContent = {
+                                Switch(
+                                    checked = useTrueDarkColor,
+                                    onCheckedChange = {
+                                        useTrueDarkColor = it
+                                        SettingsManager.setBoolean(
+                                            context,
+                                            SettingsKeys.TRUE_DARK_COLOR,
+                                            it
+                                        )
+                                    }
+                                )
+                            }
+                        )
                     }
 
                     item {
@@ -193,7 +181,7 @@ class AppearanceScreen : Screen {
                                         )
                                     }
                                 )
-                            }
+                            },
                         )
                     }
                 }

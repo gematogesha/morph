@@ -100,7 +100,7 @@ class SettingsScreen: Screen {
                                         contentDescription = "Info",
                                         tint = MaterialTheme.colorScheme.primary
                                     )
-                                }
+                                },
                             )
                         }
                     }

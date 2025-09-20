@@ -15,7 +15,7 @@ data class Challenge(
     val status: ChallengeStatus = ChallengeStatus.IN_PROGRESS,
     val duration: Int = 21,
     val schedule: ChallengeSchedule = ChallengeSchedule.EVERY_DAY,
-    val notifyAt: Time? = null,
+    val notifyAt: Time? = Time(20, 0),
     val color: ChallengeColor = ChallengeColor.LIGHTPURPLE
 )
 
@@ -49,26 +49,26 @@ data class ChallengeEntry(
 )
 
 fun calculateCurrentStreak(entries: List<ChallengeEntry>): Int {
-    val grouped = entries
+    val entriesByDay = entries
         .groupBy { it.date.truncateToDay() }
-        .filterValues { tasks -> tasks.all { it.done } }
+        .filterValues { entriesInDay -> entriesInDay.all { it.done } }
 
-    if (grouped.isEmpty()) return 0
+    if (entriesByDay.isEmpty()) return 0
 
-    val days = grouped.keys.sortedDescending()
+    val completedDaysSortedDesc = entriesByDay.keys.sortedDescending()
     var streak = 0
-    var cal = days.first()
+    var currentDayForStreakCalculation = completedDaysSortedDesc.first()
 
     while (true) {
-        if (cal !in grouped) break
+        if (currentDayForStreakCalculation !in entriesByDay) break
         streak++
 
-        val next = Calendar.getInstance().apply {
-            time = cal
+        val previousDay = Calendar.getInstance().apply {
+            time = currentDayForStreakCalculation
             add(Calendar.DATE, -1)
         }.time.truncateToDay()
 
-        cal = next
+        currentDayForStreakCalculation = previousDay
     }
 
     return streak
@@ -76,20 +76,20 @@ fun calculateCurrentStreak(entries: List<ChallengeEntry>): Int {
 
 //TODO: Сделать сохранение в БД User
 fun calculateMaxStreak(entries: List<ChallengeEntry>): Int {
-    val grouped = entries.groupBy { it.date.truncateToDay() }
-    val allDates = grouped.keys.sorted()
+    val entriesByDay = entries.groupBy { it.date.truncateToDay() }
+    val entryDatesSortedAsc = entriesByDay.keys.sorted()
 
     var maxStreak = 0
     var currentStreak = 0
     var prevDay: Date? = null
 
-    for (day in allDates) {
-        val allDone = grouped[day]?.all { it.done } == true
+    for (day in entryDatesSortedAsc) {
+        val allDone = entriesByDay[day]?.all { it.done } == true
 
         if (allDone) {
             if (prevDay != null) {
-                val diff = (day.time - prevDay.time) / (1000 * 60 * 60 * 24)
-                currentStreak = if (diff == 1L) currentStreak + 1 else 1
+                val dayDifference = (day.time - prevDay.time) / (1000 * 60 * 60 * 24)
+                currentStreak = if (dayDifference == 1L) currentStreak + 1 else 1
             } else {
                 currentStreak = 1
             }

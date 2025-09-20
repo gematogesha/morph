@@ -27,17 +27,21 @@ fun SettingsLabel (title: String) {
 
 @Composable
 fun SettingsItem(
+    modifier: Modifier = Modifier,
     title: String,
     subTitle: String? = null,
     action: (() -> Unit)? = null,
     icon: (@Composable () -> Unit)? = null,
-    trailingContent: (@Composable () -> Unit)? = null
+    trailingContent: (@Composable () -> Unit)? = null,
+    enabled: Boolean = true
 ) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .height(72.dp)
             .fillMaxWidth()
-            .clickable {
+            .clickable(
+                enabled = enabled && action != null,
+            ) {
                 if (action != null) {
                     action()
                 }
