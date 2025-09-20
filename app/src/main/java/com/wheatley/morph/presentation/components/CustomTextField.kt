@@ -57,7 +57,7 @@ fun CustomTextField(
         colors = TextFieldDefaults.colors(
             unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
             focusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
-            focusedIndicatorColor = MaterialTheme.colorScheme.primary, // фиолетовый
+            focusedIndicatorColor = MaterialTheme.colorScheme.primary, // используем текущий primary-цвет темы
             unfocusedIndicatorColor = Color(0x00000000),
             focusedLabelColor = Color(0xFF000000),
             unfocusedLabelColor = Color(0xFF000000),

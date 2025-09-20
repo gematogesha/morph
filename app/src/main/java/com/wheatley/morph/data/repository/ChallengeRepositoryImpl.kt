@@ -60,14 +60,6 @@ class ChallengeRepositoryImpl(
                 ChallengeEntry(challengeId = challengeId, date = dayDate, done = completed)
             )
         }
-
-        dao.upsertEntry(
-            ChallengeEntry(
-                challengeId = challengeId,
-                date = dayDate,
-                done = completed
-            )
-        )
     }
 
     override suspend fun getCurrentStreak(): Int {
