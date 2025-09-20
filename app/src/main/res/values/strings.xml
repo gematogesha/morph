@@ -4,4 +4,26 @@
     <string name="channel_app_updates_description">Уведомления о новых версиях и установке</string>
     <string name="update_check_eol">Обновление невозможно</string>
     <string name="update_check_no_new_updates">Нет доступных обновлений</string>
+    <string name="challenge_reminder_channel">Напоминания о челленджах</string>
+    <string name="challenge_reminder_channel_description">Напоминания, если задание на сегодня ещё не выполнено</string>
+    <string name="challenge_reminder_title">Напоминание о челлендже</string>
+    <string name="challenge_reminder_message">Пора выполнить «%1$s»</string>
+    <string name="notifications_screen_title">Уведомления</string>
+    <string name="notifications_toggle_title">Напоминания</string>
+    <string name="notifications_toggle_enabled">Уведомления о челленджах включены</string>
+    <string name="notifications_toggle_disabled">Уведомления отключены</string>
+    <string name="notifications_list_title">Запланированные уведомления</string>
+    <string name="notifications_list_empty">Добавьте напоминание в настройках челленджа, чтобы увидеть его здесь.</string>
+    <string name="notifications_state_disabled">Уведомления отключены</string>
+    <string name="notifications_state_waiting">Ожидает планирования</string>
+    <string name="notifications_state_next">Следующее: %1$s</string>
+    <string name="notifications_state_blocked">В ожидании</string>
+    <string name="notifications_state_cancelled">Отменено</string>
+    <string name="notifications_state_enqueued">Запланировано</string>
+    <string name="notifications_state_failed">Ошибка</string>
+    <string name="notifications_state_running">Выполняется</string>
+    <string name="notifications_state_succeeded">Выполнено</string>
+    <string name="add_challenge_reminder_title">Напоминание</string>
+    <string name="add_challenge_reminder_off">Выключено</string>
+    <string name="add_challenge_reminder_time">Каждый день в %1$s</string>
 </resources>

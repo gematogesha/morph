@@ -11,6 +11,7 @@ import com.wheatley.morph.domain.repository.ChallengeRepository
 import com.wheatley.morph.data.repository.ChallengeRepositoryImpl
 import com.wheatley.morph.presentation.add.AddChallengeScreenModel
 import com.wheatley.morph.presentation.onboarding.OnBoardingScreenModel
+import com.wheatley.morph.notifications.ChallengeReminderScheduler
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 import org.koin.core.module.dsl.singleOf
@@ -38,6 +39,13 @@ object DiModules {
         return ChallengeRepositoryImpl(dao)
     }
 
+    private fun provideReminderScheduler(
+        context: Context,
+        repository: ChallengeRepository
+    ): ChallengeReminderScheduler {
+        return ChallengeReminderScheduler(context, repository)
+    }
+
     val databaseModule = module {
         single { provideDatabase(androidContext()) }
         single { provideChallengeDao(get()) }
@@ -47,12 +55,16 @@ object DiModules {
         singleOf(::provideChallengeRepository)
     }
 
+    val reminderModule = module {
+        single { provideReminderScheduler(androidContext(), get()) }
+    }
+
     val screenModelModule = module {
-        factory { ChallengeScreenModel(get()) }
+        factory { ChallengeScreenModel(get(), get()) }
     }
 
     val addChallengeModule = module {
-        factory { AddChallengeScreenModel(get()) } // get() = ChallengeRepository
+        factory { AddChallengeScreenModel(get(), get()) } // get() = ChallengeRepository
     }
 
     val onBoardingModule = module {
@@ -71,6 +83,7 @@ fun initKoinModules(context: Context) {
         modules(
             DiModules.databaseModule,
             DiModules.repositoryModule,
+            DiModules.reminderModule,
             DiModules.screenModelModule,
             DiModules.addChallengeModule,
             DiModules.onBoardingModule,

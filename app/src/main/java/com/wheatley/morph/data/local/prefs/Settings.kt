@@ -26,4 +26,5 @@ object SettingsKeys {
     const val TRUE_DARK_COLOR = "true_dark_color"
     const val SHOW_COMPLETED_TASKS = "show_completed_tasks"
     const val USE_ANIMATIONS = "use_animations"
+    const val CHALLENGE_REMINDERS = "challenge_reminders"
 }

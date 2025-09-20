@@ -1,6 +1,7 @@
 package com.wheatley.morph.presentation.add
 
 import android.annotation.SuppressLint
+import android.app.TimePickerDialog
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -46,10 +47,12 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.Switch
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -62,19 +65,24 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.koinScreenModel
 import com.wheatley.morph.R
 import com.wheatley.morph.domain.model.ChallengeColor
+import com.wheatley.morph.domain.model.Time
 import com.wheatley.morph.presentation.components.CustomTextField
 import com.wheatley.morph.ui.theme.ColorFamily
 import com.wheatley.morph.ui.theme.LocalExColorScheme
 import com.wheatley.morph.core.app.pluralDays
+import com.wheatley.morph.core.date.format
 import com.wheatley.morph.data.local.helpers.SnackbarHelper
 import kotlinx.coroutines.launch
+import java.util.Calendar
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
@@ -88,6 +96,7 @@ class AddChallengeScreen : Screen {
         val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
         val scope = rememberCoroutineScope()
+        val context = LocalContext.current
 
         fun filterSingleEmoji(input: String): String {
             val regex = Regex("""\X""")
@@ -123,6 +132,7 @@ class AddChallengeScreen : Screen {
 
         var currentDay by remember { mutableIntStateOf(0) }
         var showDurationField by remember { mutableStateOf(false) }
+        var showTimePicker by remember { mutableStateOf(false) }
 
 
         LaunchedEffect(screenModel) {
@@ -137,7 +147,27 @@ class AddChallengeScreen : Screen {
             if (state.resetTrigger) {
                 currentDay = 0
                 showDurationField = false
+                showTimePicker = false
                 screenModel.resetHandled()
+            }
+        }
+
+        if (showTimePicker) {
+            DisposableEffect(Unit) {
+                val initialHour = state.notifyAt?.hour ?: Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+                val initialMinute = state.notifyAt?.minute ?: Calendar.getInstance().get(Calendar.MINUTE)
+                val dialog = TimePickerDialog(
+                    context,
+                    { _, hour, minute ->
+                        screenModel.updateNotifyAt(Time(hour, minute))
+                    },
+                    initialHour,
+                    initialMinute,
+                    true
+                )
+                dialog.setOnDismissListener { showTimePicker = false }
+                dialog.show()
+                onDispose { dialog.dismiss() }
             }
         }
 
@@ -295,6 +325,20 @@ class AddChallengeScreen : Screen {
                             )
                         }
                     }
+
+                    item {
+                        ReminderPicker(
+                            notifyAt = state.notifyAt,
+                            onClick = { showTimePicker = true },
+                            onToggle = { enabled ->
+                                if (enabled) {
+                                    showTimePicker = true
+                                } else {
+                                    screenModel.updateNotifyAt(null)
+                                }
+                            }
+                        )
+                    }
                 }
             }
         }
@@ -395,6 +439,39 @@ fun ColorPicker(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun ReminderPicker(
+    notifyAt: Time?,
+    onClick: () -> Unit,
+    onToggle: (Boolean) -> Unit
+) {
+    val isEnabled = notifyAt != null
+    val subtitle = notifyAt?.let { stringResource(R.string.add_challenge_reminder_time, it.format()) }
+        ?: stringResource(R.string.add_challenge_reminder_off)
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+            .padding(bottom = 16.dp)
+            .clip(RoundedCornerShape(16.dp))
+            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
+            .clickable { onClick() }
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(stringResource(R.string.add_challenge_reminder_title), style = MaterialTheme.typography.bodyLarge)
+            Text(subtitle, color = MaterialTheme.colorScheme.outline)
+        }
+        Switch(
+            checked = isEnabled,
+            onCheckedChange = onToggle
+        )
     }
 }
 
